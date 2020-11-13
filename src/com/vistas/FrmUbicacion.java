@@ -10,7 +10,6 @@ import com.controller.UbicacionJpaController;
 import com.entities.Proyecto;
 import com.entities.Ubicacion;
 import com.utilidades.Mensajeria;
-import com.utilidades.ValidarAccesos;
 import com.utilidades.ValidarCampos;
 import java.util.List;
 import javax.swing.JOptionPane;
@@ -20,8 +19,8 @@ import javax.swing.table.DefaultTableModel;
  * Nombre de Formulario: FrmUbicacion
  * Fecha: 07/11/2020 
  * CopyRigth: Pedro Campos
- * Modificacion: 07/11/2020
- * Version: 1.0
+ * Modificacion: 12/11/2020
+ * Version: 1.1
  * @author pedro
  */
 public class FrmUbicacion extends javax.swing.JInternalFrame {
@@ -40,34 +39,10 @@ public class FrmUbicacion extends javax.swing.JInternalFrame {
     
     public FrmUbicacion() {
         initComponents();
-        setResizable(false);
+        this.setTitle("Ubicaciones");
+        //setResizable(false);
+        jPanel1.setOpaque(false);
         mostrarDatos();
-        nivelAcceso();
-    }
-    
-    public void nivelAcceso() {
-        ValidarAccesos obj = new ValidarAccesos();
-
-        try {
-
-            switch (obj.getAcceso().getTipoNivel()) {
-                case "Administrador":
-                    //desbloquea la accion de los botones del formulario
-                    habilitar();
-                    break;
-                case "Empleado":
-                    //bloquea la accion de los botones del formulario
-                    deshabilitar();
-                    break;
-                case "Invitado":
-                    //bloquea la accion de los botones del formulario
-                    deshabilitar();
-                    break;
-                default:
-                    break;
-            }
-        } catch (Exception e) {
-        }
     }
 
     public void mostrarDatos() {
@@ -78,14 +53,16 @@ public class FrmUbicacion extends javax.swing.JInternalFrame {
         try {
             List lista;
             lista = daoUbicacion.findUbicacionEntities();
-            for (int i = 0; i < lista.size(); i++) {
-                location = (Ubicacion) lista.get(i);
-                datos[0] = location.getIdUbicacion();
-                datos[1] = location.getNombre();
-                datos[2] = location.getLatitud();
-                datos[3] = location.getLongitud();
-                tabla.addRow(datos);
-            }
+            
+            if(lista != null)
+                for (int i = 0; i < lista.size(); i++) {
+                    location = (Ubicacion) lista.get(i);
+                    datos[0] = location.getIdUbicacion();
+                    datos[1] = location.getNombre();
+                    datos[2] = location.getLatitud();
+                    datos[3] = location.getLongitud();
+                    tabla.addRow(datos);
+                }
             this.TablaUbicaciones.setModel(tabla);
         } catch (Exception e) {
             message.printMessageAlerts("¡Error: " + e.getMessage() + "!", "Error", JOptionPane.ERROR_MESSAGE);
@@ -107,37 +84,47 @@ public class FrmUbicacion extends javax.swing.JInternalFrame {
     }
 
     public void limpiarCampos() {
-        this.txtCodigo.setText("");
-        latitud = "";
-        longitud = "";
-        nombre = "";
-        modificacion = false;
+        try {
+            this.txtCodigo.setText("");
+            latitud = "";
+            longitud = "";
+            nombre = "";
+            modificacion = false;
+        } catch (Exception e) {
+        }
     }
 
     public void llenarTabla() {
-        int fila = this.TablaUbicaciones.getSelectedRow();
-        this.txtCodigo.setText(String.valueOf(this.TablaUbicaciones.getValueAt(fila, 0)));
-        nombre = (String.valueOf(this.TablaUbicaciones.getValueAt(fila, 1)));
-        latitud = (String.valueOf(this.TablaUbicaciones.getValueAt(fila, 2)));
-        longitud = (String.valueOf(this.TablaUbicaciones.getValueAt(fila, 3)));
-        modificacion = true;
+        try {
+            int fila = this.TablaUbicaciones.getSelectedRow();
+            this.txtCodigo.setText(String.valueOf(this.TablaUbicaciones.getValueAt(fila, 0)));
+            nombre = (String.valueOf(this.TablaUbicaciones.getValueAt(fila, 1)));
+            latitud = (String.valueOf(this.TablaUbicaciones.getValueAt(fila, 2)));
+            longitud = (String.valueOf(this.TablaUbicaciones.getValueAt(fila, 3)));
+            modificacion = true;
+        } catch (Exception e) {
+        }
     }
 
     public void setearValores() {
-        //se coloca cero por el autoincrement de la base de datos
-        Ubicacion newLocation = new Ubicacion();
-        
-        newLocation = location.getLocation();
-        
-        if(newLocation.getLatitud() == 0.0){
-            message.printMessageAlerts("¡Debe seleccionar las coordenadas\npor medio del mapa!", "Mensaje", JOptionPane.WARNING_MESSAGE);
-            return;
+        try {
+            //se coloca cero por el autoincrement de la base de datos
+            Ubicacion newLocation = new Ubicacion();
+
+            newLocation = location.getLocation();
+
+            if(newLocation.getLatitud() == 0.0){
+                message.printMessageAlerts("¡Debe seleccionar las coordenadas\npor medio del mapa!", "Mensaje", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            location.setIdUbicacion(0);
+            location.setNombre(newLocation.getNombre());
+            location.setLatitud(newLocation.getLatitud());
+            location.setLongitud(newLocation.getLongitud());
+        } catch (Exception e) {
         }
-        
-        location.setIdUbicacion(0);
-        location.setNombre(newLocation.getNombre());
-        location.setLatitud(newLocation.getLatitud());
-        location.setLongitud(newLocation.getLongitud());    
+    
     }
 
     public void insertar() {
@@ -246,11 +233,18 @@ public class FrmUbicacion extends javax.swing.JInternalFrame {
         jLabel4 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         TablaUbicaciones = new javax.swing.JTable();
+        jLabel3 = new javax.swing.JLabel();
 
         setClosable(true);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         btnMapa.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
-        btnMapa.setText("Mapa");
+        btnMapa.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/mapa.png"))); // NOI18N
+        btnMapa.setMargin(new java.awt.Insets(0, 4, 0, 4));
+        btnMapa.setMaximumSize(new java.awt.Dimension(29, 29));
+        btnMapa.setMinimumSize(new java.awt.Dimension(29, 29));
         btnMapa.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 btnMapaMouseClicked(evt);
@@ -270,12 +264,18 @@ public class FrmUbicacion extends javax.swing.JInternalFrame {
                 btnMapaActionPerformed(evt);
             }
         });
+        jPanel1.add(btnMapa, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 60, 76, -1));
 
-        jLabel1.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        jLabel1.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setText("Gestión del ubicaciones");
+        jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 10, 190, -1));
+        jLabel1.getAccessibleContext().setAccessibleName("Gestión del ubicaciones.");
 
         jLabel2.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
         jLabel2.setText("Código:");
+        jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 50, -1, -1));
 
         txtCodigo.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
         txtCodigo.setEnabled(false);
@@ -284,105 +284,62 @@ public class FrmUbicacion extends javax.swing.JInternalFrame {
                 txtCodigoKeyTyped(evt);
             }
         });
+        jPanel1.add(txtCodigo, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 40, 143, -1));
 
         btnLimpiar.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
-        btnLimpiar.setText("Cancelar");
+        btnLimpiar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/icons8-cancelar-24.png"))); // NOI18N
+        btnLimpiar.setMargin(new java.awt.Insets(2, 6, 2, 6));
         btnLimpiar.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 btnLimpiarMouseClicked(evt);
             }
         });
+        jPanel1.add(btnLimpiar, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 110, -1, -1));
 
         btnNuevo.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
-        btnNuevo.setText("Nuevo");
+        btnNuevo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/add.png"))); // NOI18N
+        btnNuevo.setMargin(new java.awt.Insets(2, 6, 2, 6));
         btnNuevo.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 btnNuevoMouseClicked(evt);
             }
         });
+        jPanel1.add(btnNuevo, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 110, -1, -1));
 
         btnInsertar.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
-        btnInsertar.setText("Guardar");
+        btnInsertar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/icons8-guardar-24.png"))); // NOI18N
+        btnInsertar.setMargin(new java.awt.Insets(2, 6, 2, 6));
         btnInsertar.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 btnInsertarMouseClicked(evt);
             }
         });
+        jPanel1.add(btnInsertar, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 110, -1, -1));
 
         btnEliminar.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
-        btnEliminar.setText("Eliminar");
+        btnEliminar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/icons8-basura-24.png"))); // NOI18N
+        btnEliminar.setMargin(new java.awt.Insets(2, 6, 2, 6));
         btnEliminar.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 btnEliminarMouseClicked(evt);
             }
         });
+        jPanel1.add(btnEliminar, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 110, -1, -1));
 
         btnModificar.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
-        btnModificar.setText("Modificar");
+        btnModificar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/icons8-editar-archivo-24.png"))); // NOI18N
+        btnModificar.setMargin(new java.awt.Insets(2, 6, 2, 6));
         btnModificar.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 btnModificarMouseClicked(evt);
             }
         });
+        jPanel1.add(btnModificar, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 110, -1, -1));
 
         jLabel4.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        jLabel4.setForeground(new java.awt.Color(255, 255, 255));
         jLabel4.setText("Seleccionar las coordenadas por medio del mapa");
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(21, 21, 21)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(btnNuevo)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(btnInsertar)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(btnModificar)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(btnEliminar)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(btnLimpiar))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(jLabel2)
-                                .addGap(23, 23, 23)
-                                .addComponent(txtCodigo, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(jLabel4)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(btnMapa, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(146, 146, 146)
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 225, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(54, Short.MAX_VALUE))
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(jLabel1)
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(txtCodigo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel4)
-                    .addComponent(btnMapa))
-                .addGap(15, 15, 15)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnNuevo)
-                    .addComponent(btnInsertar)
-                    .addComponent(btnModificar)
-                    .addComponent(btnEliminar)
-                    .addComponent(btnLimpiar))
-                .addGap(0, 11, Short.MAX_VALUE))
-        );
-
-        jLabel1.getAccessibleContext().setAccessibleName("Gestión del ubicaciones.");
+        jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 80, -1, -1));
 
         TablaUbicaciones.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -402,26 +359,12 @@ public class FrmUbicacion extends javax.swing.JInternalFrame {
         });
         jScrollPane1.setViewportView(TablaUbicaciones);
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(jScrollPane1)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
+        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 160, 510, 117));
+
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 20, 530, 290));
+
+        jLabel3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/Fondo.jpg"))); // NOI18N
+        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 570, 330));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -452,6 +395,7 @@ public class FrmUbicacion extends javax.swing.JInternalFrame {
 
     private void btnNuevoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnNuevoMouseClicked
         limpiarCampos();
+        modificacion = false;
     }//GEN-LAST:event_btnNuevoMouseClicked
 
     private void btnLimpiarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnLimpiarMouseClicked
@@ -482,6 +426,9 @@ public class FrmUbicacion extends javax.swing.JInternalFrame {
         if(modificacion){
             FrmGenerarMapa mapa = new FrmGenerarMapa(modificacion, Double.parseDouble(latitud), Double.parseDouble(longitud), nombre);
             mapa.setVisible(true);
+        }else{
+            FrmGenerarMapa mapa = new FrmGenerarMapa(false, 0, 0, "");
+            mapa.setVisible(true);
         }
     }//GEN-LAST:event_btnMapaMouseClicked
 
@@ -496,6 +443,7 @@ public class FrmUbicacion extends javax.swing.JInternalFrame {
     private javax.swing.JButton btnNuevo;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;

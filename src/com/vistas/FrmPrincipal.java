@@ -6,8 +6,8 @@ import com.utilidades.ValidarAccesos;
  * Nombre de la clase: FrmPrincipal 
  * Fecha: 1/11/2020 
  * CopyRigth: Pedro Campos
- * Modificacion: 09/11/2020 
- * Version: 1.2
+ * Modificacion: 12/11/2020 
+ * Version: 1.4
  * @author pedro
  */
 public class FrmPrincipal extends javax.swing.JFrame {
@@ -24,7 +24,8 @@ public class FrmPrincipal extends javax.swing.JFrame {
 
     public FrmPrincipal() {
         initComponents();
-        setResizable(true);
+        this.setTitle("Menu Principal");
+        //setResizable(true);
         setLocationRelativeTo(null);
         setExtendedState(FrmPrincipal.MAXIMIZED_BOTH);
         nivelAcceso();
@@ -68,13 +69,20 @@ public class FrmPrincipal extends javax.swing.JFrame {
         menuBar = new javax.swing.JMenuBar();
         fileMenu = new javax.swing.JMenu();
         ubicacionItem = new javax.swing.JMenuItem();
+        jSeparator1 = new javax.swing.JPopupMenu.Separator();
         usuarioItem = new javax.swing.JMenuItem();
+        jSeparator2 = new javax.swing.JPopupMenu.Separator();
         ubicacionesItem = new javax.swing.JMenuItem();
+        jSeparator3 = new javax.swing.JPopupMenu.Separator();
         rolesItem = new javax.swing.JMenuItem();
+        jSeparator4 = new javax.swing.JPopupMenu.Separator();
         empleadoItem = new javax.swing.JMenuItem();
+        jSeparator5 = new javax.swing.JPopupMenu.Separator();
         pagoEmpleadoItem = new javax.swing.JMenuItem();
-        maquinariaItem = new javax.swing.JMenuItem();
+        jSeparator6 = new javax.swing.JPopupMenu.Separator();
         tipoMaquinariaITEM = new javax.swing.JMenuItem();
+        jSeparator7 = new javax.swing.JPopupMenu.Separator();
+        maquinariaItem = new javax.swing.JMenuItem();
         editMenu = new javax.swing.JMenu();
         cutMenuItem = new javax.swing.JMenuItem();
         copyMenuItem = new javax.swing.JMenuItem();
@@ -97,6 +105,7 @@ public class FrmPrincipal extends javax.swing.JFrame {
         fileMenu.setMnemonic('f');
         fileMenu.setText("Ventanas");
 
+        ubicacionItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/proyecto.png"))); // NOI18N
         ubicacionItem.setText("Proyectos");
         ubicacionItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -104,7 +113,9 @@ public class FrmPrincipal extends javax.swing.JFrame {
             }
         });
         fileMenu.add(ubicacionItem);
+        fileMenu.add(jSeparator1);
 
+        usuarioItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/usuario.png"))); // NOI18N
         usuarioItem.setText("Usuarios");
         usuarioItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -112,7 +123,9 @@ public class FrmPrincipal extends javax.swing.JFrame {
             }
         });
         fileMenu.add(usuarioItem);
+        fileMenu.add(jSeparator2);
 
+        ubicacionesItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/pin-de-mapa.png"))); // NOI18N
         ubicacionesItem.setText("Ubicaciones");
         ubicacionesItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -120,7 +133,9 @@ public class FrmPrincipal extends javax.swing.JFrame {
             }
         });
         fileMenu.add(ubicacionesItem);
+        fileMenu.add(jSeparator3);
 
+        rolesItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/nivel.png"))); // NOI18N
         rolesItem.setText("Roles");
         rolesItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -128,7 +143,9 @@ public class FrmPrincipal extends javax.swing.JFrame {
             }
         });
         fileMenu.add(rolesItem);
+        fileMenu.add(jSeparator4);
 
+        empleadoItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/niveles.png"))); // NOI18N
         empleadoItem.setText("Empleados");
         empleadoItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -136,7 +153,9 @@ public class FrmPrincipal extends javax.swing.JFrame {
             }
         });
         fileMenu.add(empleadoItem);
+        fileMenu.add(jSeparator5);
 
+        pagoEmpleadoItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/financiero.png"))); // NOI18N
         pagoEmpleadoItem.setText("Pago Empleados");
         pagoEmpleadoItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -144,7 +163,19 @@ public class FrmPrincipal extends javax.swing.JFrame {
             }
         });
         fileMenu.add(pagoEmpleadoItem);
+        fileMenu.add(jSeparator6);
 
+        tipoMaquinariaITEM.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/icons8-configuración-3-24.png"))); // NOI18N
+        tipoMaquinariaITEM.setText("Tipo Maquinaria");
+        tipoMaquinariaITEM.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tipoMaquinariaITEMActionPerformed(evt);
+            }
+        });
+        fileMenu.add(tipoMaquinariaITEM);
+        fileMenu.add(jSeparator7);
+
+        maquinariaItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/maquinaria-pesada.png"))); // NOI18N
         maquinariaItem.setText("Maquinaria");
         maquinariaItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -153,18 +184,10 @@ public class FrmPrincipal extends javax.swing.JFrame {
         });
         fileMenu.add(maquinariaItem);
 
-        tipoMaquinariaITEM.setText("Tipo Maquinaria");
-        tipoMaquinariaITEM.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                tipoMaquinariaITEMActionPerformed(evt);
-            }
-        });
-        fileMenu.add(tipoMaquinariaITEM);
-
         menuBar.add(fileMenu);
 
         editMenu.setMnemonic('e');
-        editMenu.setText("Opciones");
+        editMenu.setText("Reportes");
 
         cutMenuItem.setMnemonic('t');
         cutMenuItem.setText("Cut");
@@ -319,6 +342,13 @@ public class FrmPrincipal extends javax.swing.JFrame {
     private javax.swing.JMenu editMenu;
     private javax.swing.JMenuItem empleadoItem;
     private javax.swing.JMenu fileMenu;
+    private javax.swing.JPopupMenu.Separator jSeparator1;
+    private javax.swing.JPopupMenu.Separator jSeparator2;
+    private javax.swing.JPopupMenu.Separator jSeparator3;
+    private javax.swing.JPopupMenu.Separator jSeparator4;
+    private javax.swing.JPopupMenu.Separator jSeparator5;
+    private javax.swing.JPopupMenu.Separator jSeparator6;
+    private javax.swing.JPopupMenu.Separator jSeparator7;
     private javax.swing.JMenuItem maquinariaItem;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JMenuItem pagoEmpleadoItem;

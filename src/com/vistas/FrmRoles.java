@@ -16,8 +16,8 @@ import javax.swing.table.DefaultTableModel;
  * Nombre del Formulario: FrmRoles
  * Fecha: 09/11/2020 
  * CopyRight: Pedro Campos
- * modificación:09/11/2020 
- * Version: 1.0
+ * modificación: 12/11/2020 
+ * Version: 1.1
  * @author pedro
  */
 public class FrmRoles extends javax.swing.JInternalFrame {
@@ -28,6 +28,9 @@ public class FrmRoles extends javax.swing.JInternalFrame {
     
     public FrmRoles() {
         initComponents();
+        this.setTitle("Roles");
+        //setResizable(false);
+        jPanel1.setOpaque(false);
         mostrarDatos();
         deshabilitar();
     }
@@ -56,12 +59,14 @@ public class FrmRoles extends javax.swing.JInternalFrame {
         try {
             List lista;
             lista = daoRol.findRolEntities();
-            for (int i = 0; i < lista.size(); i++) {
-                rol = (Rol) lista.get(i);
-                datos[0] = rol.getIdRol();
-                datos[1] = rol.getTipo();
-                tabla.addRow(datos);
-            }
+            
+            if(lista != null)
+                for (int i = 0; i < lista.size(); i++) {
+                    rol = (Rol) lista.get(i);
+                    datos[0] = rol.getIdRol();
+                    datos[1] = rol.getTipo();
+                    tabla.addRow(datos);
+                }
             this.TablaDatos.setModel(tabla);
         } catch (Exception e) {
             message.printMessageAlerts("¡Error: " + e.getMessage() + "!", "Error", JOptionPane.ERROR_MESSAGE);
@@ -69,20 +74,28 @@ public class FrmRoles extends javax.swing.JInternalFrame {
     }
 
     public void llenarTabla() {
-        Rol list;
-        int fila = this.TablaDatos.getSelectedRow();
-        this.txtIdRol.setText(String.valueOf(this.TablaDatos.getValueAt(fila, 0)));
-        this.txtNombre.setText(String.valueOf(this.TablaDatos.getValueAt(fila, 1)));
+        try {
+            int fila = this.TablaDatos.getSelectedRow();
+            this.txtIdRol.setText(String.valueOf(this.TablaDatos.getValueAt(fila, 0)));
+            this.txtNombre.setText(String.valueOf(this.TablaDatos.getValueAt(fila, 1)));
+        } catch (Exception e) {
+        }
     }
 
     public void limpiarCampos() {
-        txtIdRol.setText("");
-        txtNombre.setText("");
+        try {
+            txtIdRol.setText("");
+            txtNombre.setText("");
+        } catch (Exception e) {
+        }
     }
 
     public void setearValores() {
-        rol.setIdRol(0);
-        rol.setTipo(txtNombre.getText());
+        try {
+            rol.setIdRol(0);
+            rol.setTipo(txtNombre.getText());
+        } catch (Exception e) {
+        }
     }
 
     public void insertar() {
@@ -161,22 +174,34 @@ public class FrmRoles extends javax.swing.JInternalFrame {
         btnModificar = new javax.swing.JButton();
         btnEliminar = new javax.swing.JButton();
         btnCancelar = new javax.swing.JButton();
+        jLabel4 = new javax.swing.JLabel();
 
         setClosable(true);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLabel1.setFont(new java.awt.Font("Times New Roman", 1, 18)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setText("Gestión de roles");
+        jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 0, -1, -1));
 
         jLabel2.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
         jLabel2.setText("ID Rol:");
+        jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 40, -1, -1));
 
         jLabel3.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(255, 255, 255));
         jLabel3.setText("Nombre:");
+        jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(195, 40, -1, -1));
 
         txtIdRol.setEditable(false);
         txtIdRol.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        jPanel1.add(txtIdRol, new org.netbeans.lib.awtextra.AbsoluteConstraints(66, 37, 111, -1));
 
         txtNombre.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        jPanel1.add(txtNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(259, 37, 130, -1));
 
         TablaDatos.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
         TablaDatos.setModel(new javax.swing.table.DefaultTableModel(
@@ -197,119 +222,62 @@ public class FrmRoles extends javax.swing.JInternalFrame {
         });
         jScrollPane2.setViewportView(TablaDatos);
 
+        jPanel1.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 120, 380, 123));
+
         btnNuevoRegistro.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
-        btnNuevoRegistro.setText("Nuevo");
+        btnNuevoRegistro.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/add.png"))); // NOI18N
+        btnNuevoRegistro.setMargin(new java.awt.Insets(2, 6, 2, 6));
         btnNuevoRegistro.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 btnNuevoRegistroMouseClicked(evt);
             }
         });
+        jPanel1.add(btnNuevoRegistro, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 70, -1, -1));
 
         btnGuardar.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
-        btnGuardar.setText("Guardar");
+        btnGuardar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/icons8-guardar-24.png"))); // NOI18N
+        btnGuardar.setMargin(new java.awt.Insets(2, 6, 2, 6));
         btnGuardar.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 btnGuardarMouseClicked(evt);
             }
         });
+        jPanel1.add(btnGuardar, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 70, -1, -1));
 
         btnModificar.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
-        btnModificar.setText("Modificar");
+        btnModificar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/icons8-editar-archivo-24.png"))); // NOI18N
+        btnModificar.setMargin(new java.awt.Insets(2, 6, 2, 6));
         btnModificar.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 btnModificarMouseClicked(evt);
             }
         });
+        jPanel1.add(btnModificar, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 70, -1, -1));
 
         btnEliminar.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
-        btnEliminar.setText("Eliminar");
+        btnEliminar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/icons8-basura-24.png"))); // NOI18N
+        btnEliminar.setMargin(new java.awt.Insets(2, 6, 2, 6));
         btnEliminar.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 btnEliminarMouseClicked(evt);
             }
         });
+        jPanel1.add(btnEliminar, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 70, -1, -1));
 
         btnCancelar.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
-        btnCancelar.setText("Cancelar");
+        btnCancelar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/icons8-cancelar-24.png"))); // NOI18N
+        btnCancelar.setMargin(new java.awt.Insets(2, 6, 2, 6));
         btnCancelar.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 btnCancelarMouseClicked(evt);
             }
         });
+        jPanel1.add(btnCancelar, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 70, -1, -1));
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
-                                .addComponent(jLabel2)
-                                .addGap(18, 18, 18)
-                                .addComponent(txtIdRol, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(jLabel3)
-                                .addGap(18, 18, 18)
-                                .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(btnNuevoRegistro)
-                                .addGap(18, 18, 18)
-                                .addComponent(btnGuardar)
-                                .addGap(18, 18, 18)
-                                .addComponent(btnModificar)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(btnEliminar)
-                                .addGap(18, 18, 18)
-                                .addComponent(btnCancelar))))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(172, 172, 172)
-                        .addComponent(jLabel1)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(jLabel1)
-                .addGap(15, 15, 15)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel3)
-                        .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel2)
-                        .addComponent(txtIdRol, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnNuevoRegistro)
-                    .addComponent(btnGuardar)
-                    .addComponent(btnModificar)
-                    .addComponent(btnEliminar)
-                    .addComponent(btnCancelar))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
-        );
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 20, 400, 254));
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
-        );
+        jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/Fondo.jpg"))); // NOI18N
+        getContentPane().add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 440, 300));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -350,6 +318,7 @@ public class FrmRoles extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextField txtIdRol;

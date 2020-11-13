@@ -7,15 +7,19 @@ import com.controller.ProyectoJpaController;
 import com.controller.UbicacionJpaController;
 import com.entities.Proyecto;
 import com.entities.Ubicacion;
+import com.toedter.calendar.JCalendar;
 import com.utilidades.Mensajeria;
 import com.utilidades.ValidarCampos;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Nombre de la clase: FrmProyecto 
  * Fecha: 01/11/2020 CopyRight: 
  * Pedro Campos
- * modificación:05/11/2020 
- * Version: 1.1
+ * modificación: 12/11/2020 
+ * Version: 1.2
  * @author pedro
  */
 public class FrmProyecto extends javax.swing.JInternalFrame {
@@ -30,29 +34,37 @@ public class FrmProyecto extends javax.swing.JInternalFrame {
 
     public FrmProyecto() {
         initComponents();
-        setResizable(false);
+        this.setTitle("Proyectos");
+        //setResizable(false);
+        jPanel1.setOpaque(false);
         mostrarDatos();
+        
+        
+        
     }
 
     public void mostrarDatos() {
         DefaultTableModel tabla;
         String encabezados[] = {"ID Proyecto", "Nombre del proyecto", "Fecha Inicio", "Tiempo estimado",
-            "Presupuesto total", "Ubicacion"};
+            "Presupuesto total", "Ubicacion", "Estado"};
         tabla = new DefaultTableModel(null, encabezados);
-        Object datos[] = new Object[6];
+        Object datos[] = new Object[7];
         try {
             List lista;
             lista = daoProy.getAllProyects();
-            for (int i = 0; i < lista.size(); i++) {
-                proy = (Proyecto) lista.get(i);
-                datos[0] = proy.getIdProyecto();
-                datos[1] = proy.getNombreProyecto();
-                datos[2] = proy.getFechaInicio();
-                datos[3] = proy.getTiempoEstimado();
-                datos[4] = proy.getPrecioTotal();
-                datos[5] = proy.getIdUbicacion().getIdUbicacion();
-                tabla.addRow(datos);
-            }
+            
+            if(lista != null)
+                for (int i = 0; i < lista.size(); i++) {
+                    proy = (Proyecto) lista.get(i);
+                    datos[0] = proy.getIdProyecto();
+                    datos[1] = proy.getNombreProyecto();
+                    datos[2] = proy.getFechaInicio();
+                    datos[3] = proy.getTiempoEstimado();
+                    datos[4] = proy.getPrecioTotal();
+                    datos[5] = proy.getIdUbicacion().getIdUbicacion();
+                    datos[6] = proy.getEstado();
+                    tabla.addRow(datos);
+                }
             this.TablaProyecto.setModel(tabla);
         } catch (Exception e) {
             message.printMessageAlerts("¡Error: " + e.getMessage() + "!", "Error", JOptionPane.ERROR_MESSAGE);
@@ -61,9 +73,10 @@ public class FrmProyecto extends javax.swing.JInternalFrame {
 
     public void deshabilitar() {
         txtProyectoName.setEnabled(false);
-        txtFechaInicio.setEnabled(false);
+        jchFecha.setEnabled(false);
         txtTiempo.setEnabled(false);
         txtPrecio.setEnabled(false);
+        this.cmbEstado.setEnabled(false);
         this.btnInsertar.setEnabled(true);
         this.btnModificar.setEnabled(false);
         this.btnEliminar.setEnabled(false);
@@ -72,9 +85,10 @@ public class FrmProyecto extends javax.swing.JInternalFrame {
 
     public void habilitar() {
         txtProyectoName.setEnabled(true);
-        txtFechaInicio.setEnabled(true);
+        jchFecha.setEnabled(true);
         txtTiempo.setEnabled(true);
         txtPrecio.setEnabled(true);
+        this.cmbEstado.setEnabled(true);
         this.btnInsertar.setEnabled(true);
         this.btnModificar.setEnabled(true);
         this.btnEliminar.setEnabled(true);
@@ -82,30 +96,64 @@ public class FrmProyecto extends javax.swing.JInternalFrame {
     }
 
     public void limpiarCampos() {
-        this.txtCodigo.setText("");
-        this.txtProyectoName.setText("");
-        this.txtFechaInicio.setText("");
-        this.txtTiempo.setText("");
-        this.txtPrecio.setText("");
+        try {
+            this.txtCodigo.setText("");
+            this.txtProyectoName.setText("");
+            this.jchFecha.setCalendar(null);
+            this.txtTiempo.setText("");
+            this.txtPrecio.setText("");
+            this.cmbEstado.setSelectedIndex(0);
+        } catch (Exception e) {
+        }
     }
 
     public void llenarTabla() {
-        int fila = this.TablaProyecto.getSelectedRow();
-        this.txtCodigo.setText(String.valueOf(this.TablaProyecto.getValueAt(fila, 0)));
-        this.txtProyectoName.setText(String.valueOf(this.TablaProyecto.getValueAt(fila, 1)));
-        this.txtFechaInicio.setText(String.valueOf(this.TablaProyecto.getValueAt(fila, 2)));
-        this.txtTiempo.setText(String.valueOf(this.TablaProyecto.getValueAt(fila, 3)));
-        this.txtPrecio.setText(validarCampos.numberFormat(String.valueOf(this.TablaProyecto.getValueAt(fila, 4))));
+        try {
+            int fila = this.TablaProyecto.getSelectedRow();
+            this.txtCodigo.setText(String.valueOf(this.TablaProyecto.getValueAt(fila, 0)));
+            this.txtProyectoName.setText(String.valueOf(this.TablaProyecto.getValueAt(fila, 1)));
+            
+            try {
+                String sDate1 = String.valueOf(this.TablaProyecto.getValueAt(fila, 2));  
+                Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
+                this.jchFecha.setDate(date1);
+            } catch (Exception e) {
+            }
+            
+            //this.jchFecha.setText(String.valueOf(this.TablaProyecto.getValueAt(fila, 2)));
+            this.txtTiempo.setText(String.valueOf(this.TablaProyecto.getValueAt(fila, 3)));
+            this.txtPrecio.setText(validarCampos.numberFormat(String.valueOf(this.TablaProyecto.getValueAt(fila, 4))));
+            this.cmbEstado.setSelectedItem(String.valueOf(this.TablaProyecto.getValueAt(fila, 6)));
+        } catch (Exception e) {
+        }
     }
 
     public void setearValores() {
-        //se coloca cero por el autoincrement de la base de datos
-        proy.setIdProyecto(0);
-        proy.setNombreProyecto(this.txtProyectoName.getText());
-        proy.setFechaInicio(this.txtFechaInicio.getText());
-        proy.setTiempoEstimado(this.txtTiempo.getText());
-        String precio = this.txtPrecio.getText().replace("$", "").replace(",", "");
-        proy.setPrecioTotal(Double.parseDouble(precio));
+        try {
+            //se coloca cero por el autoincrement de la base de datos
+            proy.setIdProyecto(0);
+            proy.setNombreProyecto(this.txtProyectoName.getText());
+            
+            try {
+                int year;
+                int month;
+                int day;
+                
+                year = jchFecha.getCalendar().get(Calendar.YEAR);
+                month = jchFecha.getCalendar().get(Calendar.MONTH) + 1;
+                day = jchFecha.getCalendar().get(Calendar.DAY_OF_MONTH);
+                
+                proy.setFechaInicio(day + "/" + month + "/"+ year);
+            } catch (Exception e) {
+            }
+            
+            //proy.setFechaInicio(this.txtFechaInicio.getText());
+            proy.setTiempoEstimado(this.txtTiempo.getText());
+            String precio = this.txtPrecio.getText().replace("$", "").replace(",", "");
+            proy.setPrecioTotal(Double.parseDouble(precio));
+            proy.setEstado(this.cmbEstado.getSelectedItem().toString());
+        } catch (Exception e) {
+        }
     }
 
     public void insertar() {
@@ -146,13 +194,15 @@ public class FrmProyecto extends javax.swing.JInternalFrame {
             //modificar location si se cambio la ubicacion
             Ubicacion locacion = new Ubicacion();
             Ubicacion recuperar = new Ubicacion();
-            if(locacion.newLocation.getLatitud() != 0){
-                locacion.setearDatosMapa(locacion.newLocation.getLatitud(), locacion.newLocation.getLongitud(), locacion.newLocation.getNombre());
-                locacion.newLocation.setIdUbicacion(proy.getIdUbicacion().getIdUbicacion());
-                
-                recuperar = locacion.getLocation();
-                daoUbicacion.edit(recuperar);
-            }
+            
+            if(locacion.newLocation.getLatitud() != null)
+                if(locacion.newLocation.getLatitud() != 0){
+                    locacion.setearDatosMapa(locacion.newLocation.getLatitud(), locacion.newLocation.getLongitud(), locacion.newLocation.getNombre());
+                    locacion.newLocation.setIdUbicacion(proy.getIdUbicacion().getIdUbicacion());
+
+                    recuperar = locacion.getLocation();
+                    daoUbicacion.edit(recuperar);
+                }
             
             proy.setIdProyecto(Integer.parseInt(this.txtCodigo.getText()));
             int respuesta = message.printMessageConfirm("¿Desea modificar los datos?", "Mensaje", JOptionPane.YES_NO_OPTION);
@@ -193,8 +243,6 @@ public class FrmProyecto extends javax.swing.JInternalFrame {
     private void initComponents() {
 
         jLabel3 = new javax.swing.JLabel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        TablaProyecto = new javax.swing.JTable();
         jPanel1 = new javax.swing.JPanel();
         txtProyectoName = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
@@ -212,27 +260,20 @@ public class FrmProyecto extends javax.swing.JInternalFrame {
         btnInsertar = new javax.swing.JButton();
         btnEliminar = new javax.swing.JButton();
         btnModificar = new javax.swing.JButton();
-        txtFechaInicio = new javax.swing.JFormattedTextField();
+        jLabel8 = new javax.swing.JLabel();
+        cmbEstado = new javax.swing.JComboBox<>();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        TablaProyecto = new javax.swing.JTable();
+        jchFecha = new com.toedter.calendar.JDateChooser();
+        jLabel9 = new javax.swing.JLabel();
 
         setClosable(true);
+        setMaximumSize(new java.awt.Dimension(800, 800));
+        setPreferredSize(new java.awt.Dimension(696, 400));
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 510, -1, -1));
 
-        TablaProyecto.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        TablaProyecto.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                TablaProyectoMouseClicked(evt);
-            }
-        });
-        jScrollPane1.setViewportView(TablaProyecto);
+        jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         txtProyectoName.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
         txtProyectoName.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -240,12 +281,16 @@ public class FrmProyecto extends javax.swing.JInternalFrame {
                 txtProyectoNameKeyTyped(evt);
             }
         });
+        jPanel1.add(txtProyectoName, new org.netbeans.lib.awtextra.AbsoluteConstraints(185, 60, 143, -1));
 
         jLabel5.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        jLabel5.setForeground(new java.awt.Color(255, 255, 255));
         jLabel5.setText("Fecha Inicio:");
+        jPanel1.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(346, 43, -1, -1));
 
         btnMapa.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
-        btnMapa.setText("Mapa");
+        btnMapa.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/mapa.png"))); // NOI18N
+        btnMapa.setMargin(new java.awt.Insets(0, 4, 0, 4));
         btnMapa.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 btnMapaMouseClicked(evt);
@@ -265,12 +310,17 @@ public class FrmProyecto extends javax.swing.JInternalFrame {
                 btnMapaActionPerformed(evt);
             }
         });
+        jPanel1.add(btnMapa, new org.netbeans.lib.awtextra.AbsoluteConstraints(346, 104, 84, 40));
 
-        jLabel1.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        jLabel1.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setText("Gestión del proyecto.");
+        jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(197, 0, 207, -1));
 
         jLabel2.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
         jLabel2.setText("Código proyecto:");
+        jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(21, 40, -1, -1));
 
         txtCodigo.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
         txtCodigo.setEnabled(false);
@@ -279,17 +329,21 @@ public class FrmProyecto extends javax.swing.JInternalFrame {
                 txtCodigoKeyTyped(evt);
             }
         });
+        jPanel1.add(txtCodigo, new org.netbeans.lib.awtextra.AbsoluteConstraints(185, 37, 143, -1));
 
         jLabel4.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        jLabel4.setForeground(new java.awt.Color(255, 255, 255));
         jLabel4.setText("Proyecto: ");
+        jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(21, 63, -1, -1));
 
         btnLimpiar.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
-        btnLimpiar.setText("Cancelar");
+        btnLimpiar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/icons8-cancelar-24.png"))); // NOI18N
         btnLimpiar.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 btnLimpiarMouseClicked(evt);
             }
         });
+        jPanel1.add(btnLimpiar, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 160, -1, -1));
 
         txtTiempo.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
         txtTiempo.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -297,12 +351,17 @@ public class FrmProyecto extends javax.swing.JInternalFrame {
                 txtTiempoKeyTyped(evt);
             }
         });
+        jPanel1.add(txtTiempo, new org.netbeans.lib.awtextra.AbsoluteConstraints(184, 93, 144, -1));
 
         jLabel6.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        jLabel6.setForeground(new java.awt.Color(255, 255, 255));
         jLabel6.setText("Tiempo estimado en meses:");
+        jPanel1.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(21, 96, -1, -1));
 
         jLabel7.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        jLabel7.setForeground(new java.awt.Color(255, 255, 255));
         jLabel7.setText("Presupuesto Total: ");
+        jPanel1.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(21, 122, -1, -1));
 
         txtPrecio.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
         txtPrecio.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -310,175 +369,84 @@ public class FrmProyecto extends javax.swing.JInternalFrame {
                 txtPrecioKeyTyped(evt);
             }
         });
+        jPanel1.add(txtPrecio, new org.netbeans.lib.awtextra.AbsoluteConstraints(184, 119, 144, -1));
 
         btnNuevo.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
-        btnNuevo.setText("Nuevo");
+        btnNuevo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/add.png"))); // NOI18N
         btnNuevo.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 btnNuevoMouseClicked(evt);
             }
         });
+        jPanel1.add(btnNuevo, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 160, -1, -1));
 
         btnInsertar.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
-        btnInsertar.setText("Guardar");
+        btnInsertar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/icons8-guardar-24.png"))); // NOI18N
         btnInsertar.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 btnInsertarMouseClicked(evt);
             }
         });
+        jPanel1.add(btnInsertar, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 160, -1, -1));
 
         btnEliminar.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
-        btnEliminar.setText("Eliminar");
+        btnEliminar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/icons8-basura-24.png"))); // NOI18N
         btnEliminar.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 btnEliminarMouseClicked(evt);
             }
         });
+        jPanel1.add(btnEliminar, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 160, -1, -1));
 
         btnModificar.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
-        btnModificar.setText("Modificar");
+        btnModificar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/icons8-editar-archivo-24.png"))); // NOI18N
         btnModificar.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 btnModificarMouseClicked(evt);
             }
         });
+        jPanel1.add(btnModificar, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 160, -1, -1));
 
-        try {
-            txtFechaInicio.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("##/##/####")));
-        } catch (java.text.ParseException ex) {
-            ex.printStackTrace();
-        }
-        txtFechaInicio.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        jLabel8.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        jLabel8.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel8.setText("Estado:");
+        jPanel1.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(346, 76, -1, -1));
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(21, 21, 21)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                                    .addGap(72, 72, 72)
-                                    .addComponent(btnNuevo)
-                                    .addGap(31, 31, 31)
-                                    .addComponent(btnInsertar)
-                                    .addGap(18, 18, 18)
-                                    .addComponent(btnModificar)
-                                    .addGap(18, 18, 18)
-                                    .addComponent(btnEliminar)
-                                    .addGap(18, 18, 18)
-                                    .addComponent(btnLimpiar))
-                                .addGroup(jPanel1Layout.createSequentialGroup()
-                                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(jPanel1Layout.createSequentialGroup()
-                                            .addComponent(jLabel7)
-                                            .addGap(61, 61, 61)
-                                            .addComponent(txtPrecio, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                        .addGroup(jPanel1Layout.createSequentialGroup()
-                                            .addComponent(jLabel6)
-                                            .addGap(18, 18, 18)
-                                            .addComponent(txtTiempo, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                    .addGap(235, 235, 235)))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(jPanel1Layout.createSequentialGroup()
-                                        .addComponent(jLabel2)
-                                        .addGap(76, 76, 76)
-                                        .addComponent(txtCodigo, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(18, 18, 18)
-                                        .addComponent(jLabel5))
-                                    .addGroup(jPanel1Layout.createSequentialGroup()
-                                        .addComponent(jLabel4)
-                                        .addGap(112, 112, 112)
-                                        .addComponent(txtProyectoName, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(18, 18, 18)
-                                        .addComponent(btnMapa, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(txtFechaInicio, javax.swing.GroupLayout.PREFERRED_SIZE, 168, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(197, 197, 197)
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 207, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(18, Short.MAX_VALUE))
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(jLabel1)
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txtCodigo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(3, 3, 3)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel2)
-                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                .addComponent(jLabel5)
-                                .addComponent(txtFechaInicio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(3, 3, 3)
-                        .addComponent(jLabel4))
-                    .addComponent(txtProyectoName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnMapa))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(3, 3, 3)
-                        .addComponent(jLabel6))
-                    .addComponent(txtTiempo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(11, 11, 11)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel7)
-                    .addComponent(txtPrecio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(29, 29, 29)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnNuevo)
-                    .addComponent(btnInsertar)
-                    .addComponent(btnModificar)
-                    .addComponent(btnEliminar)
-                    .addComponent(btnLimpiar))
-                .addGap(0, 11, Short.MAX_VALUE))
-        );
+        cmbEstado.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        cmbEstado.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "En Proceso", "Terminado" }));
+        jPanel1.add(cmbEstado, new org.netbeans.lib.awtextra.AbsoluteConstraints(432, 73, 168, -1));
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jScrollPane1))
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                        .addGap(620, 620, 620)
-                        .addComponent(jLabel3))
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(6, 6, 6)
-                .addComponent(jLabel3)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
+        TablaProyecto.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        TablaProyecto.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                TablaProyectoMouseClicked(evt);
+            }
+        });
+        jScrollPane2.setViewportView(TablaProyecto);
+
+        jPanel1.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 210, 570, 120));
+
+        jchFecha.setDateFormatString("dd-MM-yyyy");
+        jchFecha.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        jPanel1.add(jchFecha, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 40, 170, -1));
+
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 20, 640, 350));
+
+        jLabel9.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/Fondo.jpg"))); // NOI18N
+        getContentPane().add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 700, 400));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void TablaProyectoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TablaProyectoMouseClicked
-        llenarTabla();
-    }//GEN-LAST:event_TablaProyectoMouseClicked
 
     private void btnInsertarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnInsertarMouseClicked
         insertar();
@@ -501,27 +469,6 @@ public class FrmProyecto extends javax.swing.JInternalFrame {
         limpiarCampos();
     }//GEN-LAST:event_btnNuevoMouseClicked
 
-    private void btnMapaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnMapaMouseClicked
-        FrmGenerarMapa mapa = new FrmGenerarMapa(false, 0, 0, "");
-        mapa.setVisible(true);
-    }//GEN-LAST:event_btnMapaMouseClicked
-
-    private void btnMapaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMapaActionPerformed
-
-    }//GEN-LAST:event_btnMapaActionPerformed
-
-    private void btnMapaMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnMapaMouseExited
-
-    }//GEN-LAST:event_btnMapaMouseExited
-
-    private void btnMapaMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnMapaMouseReleased
-
-    }//GEN-LAST:event_btnMapaMouseReleased
-
-    private void btnMapaMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnMapaMousePressed
-
-    }//GEN-LAST:event_btnMapaMousePressed
-
     private void txtPrecioKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtPrecioKeyTyped
         validarCampos.numbersAndPoint(evt, txtTiempo);
     }//GEN-LAST:event_txtPrecioKeyTyped
@@ -538,6 +485,31 @@ public class FrmProyecto extends javax.swing.JInternalFrame {
         
     }//GEN-LAST:event_txtTiempoKeyTyped
 
+    private void btnMapaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMapaActionPerformed
+
+    }//GEN-LAST:event_btnMapaActionPerformed
+
+    private void btnMapaMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnMapaMouseReleased
+
+    }//GEN-LAST:event_btnMapaMouseReleased
+
+    private void btnMapaMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnMapaMousePressed
+
+    }//GEN-LAST:event_btnMapaMousePressed
+
+    private void btnMapaMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnMapaMouseExited
+
+    }//GEN-LAST:event_btnMapaMouseExited
+
+    private void btnMapaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnMapaMouseClicked
+        FrmGenerarMapa mapa = new FrmGenerarMapa(false, 0, 0, "");
+        mapa.setVisible(true);
+    }//GEN-LAST:event_btnMapaMouseClicked
+
+    private void TablaProyectoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TablaProyectoMouseClicked
+        llenarTabla();
+    }//GEN-LAST:event_TablaProyectoMouseClicked
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTable TablaProyecto;
@@ -547,6 +519,7 @@ public class FrmProyecto extends javax.swing.JInternalFrame {
     private javax.swing.JButton btnMapa;
     private javax.swing.JButton btnModificar;
     private javax.swing.JButton btnNuevo;
+    private javax.swing.JComboBox<String> cmbEstado;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -554,10 +527,12 @@ public class FrmProyecto extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private com.toedter.calendar.JDateChooser jchFecha;
     private javax.swing.JTextField txtCodigo;
-    private javax.swing.JFormattedTextField txtFechaInicio;
     private javax.swing.JTextField txtPrecio;
     private javax.swing.JTextField txtProyectoName;
     private javax.swing.JTextField txtTiempo;

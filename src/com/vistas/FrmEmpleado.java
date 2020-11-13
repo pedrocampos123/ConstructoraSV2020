@@ -21,8 +21,8 @@ import javax.swing.table.DefaultTableModel;
  * Nombre del Formulario: FrmEmpleado
  * Fecha: 09/11/2020 
  * CopyRight: Pedro Campos
- * modificación:09/11/2020 
- * Version: 1.0
+ * modificación: 12/11/2020 
+ * Version: 1.1
  * @author pedro
  */
 public class FrmEmpleado extends javax.swing.JInternalFrame {
@@ -36,6 +36,9 @@ public class FrmEmpleado extends javax.swing.JInternalFrame {
     
     public FrmEmpleado() {
         initComponents();
+        this.setTitle("Empleados");
+        //setResizable(false);
+        jPanel1.setOpaque(false);
         cargarComboRol(cmbProyecto, (List<Proyecto>) daoProyecto.findProyectoEntities());
         mostrarDatos();
         deshabilitar();
@@ -69,14 +72,16 @@ public class FrmEmpleado extends javax.swing.JInternalFrame {
         try {
             List lista;
             lista = daoEmpleado.findEmpleadoEntities();
-            for (int i = 0; i < lista.size(); i++) {
-                empleado = (Empleado) lista.get(i);
-                datos[0] = empleado.getIdEmpleado();
-                datos[1] = empleado.getNombreEmpleado();
-                datos[2] = empleado.getSalario();
-                datos[3] = empleado.getIdProyecto().getIdProyecto();
-                tabla.addRow(datos);
-            }
+            
+            if(lista != null)
+                for (int i = 0; i < lista.size(); i++) {
+                    empleado = (Empleado) lista.get(i);
+                    datos[0] = empleado.getIdEmpleado();
+                    datos[1] = empleado.getNombreEmpleado();
+                    datos[2] = empleado.getSalario();
+                    datos[3] = empleado.getIdProyecto().getIdProyecto();
+                    tabla.addRow(datos);
+                }
             this.TablaDatos.setModel(tabla);
         } catch (Exception e) {
             message.printMessageAlerts("¡Error: " + e.getMessage() + "!", "Error", JOptionPane.ERROR_MESSAGE);
@@ -84,16 +89,19 @@ public class FrmEmpleado extends javax.swing.JInternalFrame {
     }
 
     public void llenarTabla() {
-        int fila = this.TablaDatos.getSelectedRow();
-        this.txtIdEmpleado.setText(String.valueOf(this.TablaDatos.getValueAt(fila, 0)));
-        this.txtNombre.setText(String.valueOf(this.TablaDatos.getValueAt(fila, 1)));
-        this.txtSalario.setText(validarCampos.numberFormat(String.valueOf(this.TablaDatos.getValueAt(fila, 2))));
-        
-        //Selecciona en ComboBox
-        int Seleccionado = Integer.parseInt(String.valueOf(this.TablaDatos.getValueAt(fila, 3)));
+        try {
+            int fila = this.TablaDatos.getSelectedRow();
+            this.txtIdEmpleado.setText(String.valueOf(this.TablaDatos.getValueAt(fila, 0)));
+            this.txtNombre.setText(String.valueOf(this.TablaDatos.getValueAt(fila, 1)));
+            this.txtSalario.setText(validarCampos.numberFormat(String.valueOf(this.TablaDatos.getValueAt(fila, 2))));
 
-        for (Proyecto obj : daoProyecto.getProyecto(Seleccionado)) {
-            this.cmbProyecto.getModel().setSelectedItem(obj.getNombreProyecto());
+            //Selecciona en ComboBox
+            int Seleccionado = Integer.parseInt(String.valueOf(this.TablaDatos.getValueAt(fila, 3)));
+
+            for (Proyecto obj : daoProyecto.getProyecto(Seleccionado)) {
+                this.cmbProyecto.getModel().setSelectedItem(obj.getNombreProyecto());
+            }
+        } catch (Exception e) {
         }
     }
 
@@ -104,31 +112,37 @@ public class FrmEmpleado extends javax.swing.JInternalFrame {
     }
 
     public void limpiarCampos() {
-        txtIdEmpleado.setText("");
-        txtNombre.setText("");
-        txtSalario.setText("");
-        cmbProyecto.setSelectedIndex(0);
+        try {
+            txtIdEmpleado.setText("");
+            txtNombre.setText("");
+            txtSalario.setText("");
+            cmbProyecto.setSelectedIndex(0);
+        } catch (Exception e) {
+        }
     }
 
     public void setearValores() {
-        empleado.setIdEmpleado(0);
-        empleado.setNombreEmpleado(txtNombre.getText());
-        String precio = this.txtSalario.getText().replace("$", "").replace(",", "");
-        empleado.setSalario(Double.parseDouble(precio));
-        
-        //recuperar datos cmbProyecto
-        String Seleccionado = cmbProyecto.getSelectedItem().toString();
-        ComboItem item = new ComboItem();
+        try {
+            empleado.setIdEmpleado(0);
+            empleado.setNombreEmpleado(txtNombre.getText());
+            String precio = this.txtSalario.getText().replace("$", "").replace(",", "");
+            empleado.setSalario(Double.parseDouble(precio));
 
-        for (int i = 0; i < cmbProyecto.getItemCount(); i++) {
-            if (Seleccionado.equals(cmbProyecto.getItemAt(i).toString())) {
-                item = cmbProyecto.getModel().getElementAt(i);
+            //recuperar datos cmbProyecto
+            String Seleccionado = cmbProyecto.getSelectedItem().toString();
+            ComboItem item = new ComboItem();
+
+            for (int i = 0; i < cmbProyecto.getItemCount(); i++) {
+                if (Seleccionado.equals(cmbProyecto.getItemAt(i).toString())) {
+                    item = cmbProyecto.getModel().getElementAt(i);
+                }
             }
+            //Seguimos obteniendo del cmbProyecto
+            proyecto.setIdProyecto(item.getValue());
+
+            empleado.setIdProyecto(proyecto);
+        } catch (Exception e) {
         }
-        //Seguimos obteniendo del cmbProyecto
-        proyecto.setIdProyecto(item.getValue());
-        
-        empleado.setIdProyecto(proyecto);
     }
 
     public void insertar() {
@@ -211,30 +225,47 @@ public class FrmEmpleado extends javax.swing.JInternalFrame {
         btnEliminar = new javax.swing.JButton();
         btnCancelar = new javax.swing.JButton();
         txtSalario = new javax.swing.JTextField();
+        jLabel6 = new javax.swing.JLabel();
 
         setClosable(true);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLabel1.setFont(new java.awt.Font("Times New Roman", 1, 18)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setText("Gestión de empleados");
+        jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 10, -1, 20));
 
         jLabel2.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
         jLabel2.setText("ID Empleado:");
+        jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 40, -1, -1));
 
         jLabel3.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(255, 255, 255));
         jLabel3.setText("Nombre:");
+        jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 78, -1, -1));
 
         jLabel4.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        jLabel4.setForeground(new java.awt.Color(255, 255, 255));
         jLabel4.setText("Salario:");
+        jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(228, 40, -1, -1));
 
         jLabel5.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        jLabel5.setForeground(new java.awt.Color(255, 255, 255));
         jLabel5.setText("Proyecto:");
+        jPanel1.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(228, 78, -1, -1));
 
         txtIdEmpleado.setEditable(false);
         txtIdEmpleado.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        jPanel1.add(txtIdEmpleado, new org.netbeans.lib.awtextra.AbsoluteConstraints(99, 37, 111, -1));
 
         txtNombre.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        jPanel1.add(txtNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(99, 75, 111, -1));
 
         cmbProyecto.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        jPanel1.add(cmbProyecto, new org.netbeans.lib.awtextra.AbsoluteConstraints(287, 75, 140, -1));
 
         TablaDatos.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
         TablaDatos.setModel(new javax.swing.table.DefaultTableModel(
@@ -255,135 +286,66 @@ public class FrmEmpleado extends javax.swing.JInternalFrame {
         });
         jScrollPane2.setViewportView(TablaDatos);
 
+        jPanel1.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 150, 420, 123));
+
         btnNuevoRegistro.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
-        btnNuevoRegistro.setText("Nuevo");
+        btnNuevoRegistro.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/add.png"))); // NOI18N
+        btnNuevoRegistro.setMargin(new java.awt.Insets(0, 4, 0, 4));
         btnNuevoRegistro.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 btnNuevoRegistroMouseClicked(evt);
             }
         });
+        jPanel1.add(btnNuevoRegistro, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 110, -1, -1));
 
         btnGuardar.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
-        btnGuardar.setText("Guardar");
+        btnGuardar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/icons8-guardar-24.png"))); // NOI18N
+        btnGuardar.setAlignmentY(0.0F);
+        btnGuardar.setMargin(new java.awt.Insets(0, 4, 0, 4));
         btnGuardar.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 btnGuardarMouseClicked(evt);
             }
         });
+        jPanel1.add(btnGuardar, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 110, -1, -1));
 
         btnModificar.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
-        btnModificar.setText("Modificar");
+        btnModificar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/icons8-editar-archivo-24.png"))); // NOI18N
+        btnModificar.setMargin(new java.awt.Insets(0, 4, 0, 4));
         btnModificar.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 btnModificarMouseClicked(evt);
             }
         });
+        jPanel1.add(btnModificar, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 110, -1, -1));
 
         btnEliminar.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
-        btnEliminar.setText("Eliminar");
+        btnEliminar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/icons8-basura-24.png"))); // NOI18N
+        btnEliminar.setMargin(new java.awt.Insets(0, 4, 0, 4));
         btnEliminar.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 btnEliminarMouseClicked(evt);
             }
         });
+        jPanel1.add(btnEliminar, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 110, -1, -1));
 
         btnCancelar.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
-        btnCancelar.setText("Cancelar");
+        btnCancelar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/icons8-cancelar-24.png"))); // NOI18N
+        btnCancelar.setMargin(new java.awt.Insets(0, 4, 0, 4));
         btnCancelar.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 btnCancelarMouseClicked(evt);
             }
         });
+        jPanel1.add(btnCancelar, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 110, -1, -1));
 
         txtSalario.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        jPanel1.add(txtSalario, new org.netbeans.lib.awtextra.AbsoluteConstraints(287, 37, 140, -1));
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel2)
-                            .addComponent(jLabel3))
-                        .addGap(18, 18, 18)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(txtIdEmpleado, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(jLabel4))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(jLabel5)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(cmbProyecto, 0, 140, Short.MAX_VALUE)
-                            .addComponent(txtSalario))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(btnNuevoRegistro)
-                        .addGap(18, 18, 18)
-                        .addComponent(btnGuardar)
-                        .addGap(18, 18, 18)
-                        .addComponent(btnModificar)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(btnEliminar)
-                        .addGap(18, 18, 18)
-                        .addComponent(btnCancelar)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel1)
-                .addGap(153, 153, 153))
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(jLabel1)
-                .addGap(15, 15, 15)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(txtIdEmpleado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel4)
-                    .addComponent(txtSalario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel3)
-                    .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(cmbProyecto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel5))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnNuevoRegistro)
-                    .addComponent(btnGuardar)
-                    .addComponent(btnModificar)
-                    .addComponent(btnEliminar)
-                    .addComponent(btnCancelar))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
-        );
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 20, 450, 290));
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
-        );
+        jLabel6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/Fondo.jpg"))); // NOI18N
+        getContentPane().add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(-2, -6, 490, 340));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -427,6 +389,7 @@ public class FrmEmpleado extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextField txtIdEmpleado;

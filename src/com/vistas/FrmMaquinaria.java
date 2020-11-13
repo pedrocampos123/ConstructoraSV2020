@@ -20,35 +20,38 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 /**
- * Nombre de la calse: FrmMaquinaria
- * Fecha: 09/11/2020
- * CopyRigth:ITCA-FEPADE
- * modificación:10/11/2020 
- * Versión:1.1
+ * Nombre del Formulario: FrmMaquinaria 
+ * Fecha: 09/11/2020 
+ * CopyRigth: ITCA-FEPADE
+ * modificación: 12/11/2020 
+ * Versión: 1.1
  * @author Jose Marroquin
  */
 public class FrmMaquinaria extends javax.swing.JInternalFrame {
 
     MaquinariaJpaController daoMaquinaria = new MaquinariaJpaController();
     ProyectoJpaController daoProyecto = new ProyectoJpaController();
-    TipomaquinariaJpaController daoTipoMaquinaria= new TipomaquinariaJpaController();
+    TipomaquinariaJpaController daoTipoMaquinaria = new TipomaquinariaJpaController();
     Tipomaquinaria tipoMaquinaria = new Tipomaquinaria();
     Maquinaria maquinaria = new Maquinaria();
     Proyecto proyecto = new Proyecto();
     Mensajeria message = new Mensajeria();
     ValidarCampos validarCampos = new ValidarCampos();
-    
+
     /**
      * Creates new form FrmMaquinaria
      */
     public FrmMaquinaria() {
         initComponents();
+        this.setTitle("Maquinaria");
+        //setResizable(false);
+        jPanel1.setOpaque(false);
         cargarComboProyecto(cmbProyecto, (List<Proyecto>) daoProyecto.findProyectoEntities());
         cargarComboTipoMaquinaria(cmbTipo, (List<Tipomaquinaria>) daoTipoMaquinaria.findTipomaquinariaEntities());
         mostrarDatos();
         deshabilitar();
     }
-    
+
     public void deshabilitar() {
         txtNombreMaquinaria.setEnabled(false);
         txtPeso.setEnabled(false);
@@ -58,7 +61,7 @@ public class FrmMaquinaria extends javax.swing.JInternalFrame {
         txtAncho.setEnabled(false);
         txtLargo.setEnabled(false);
         txtPrecio.setEnabled(false);
-        
+
         btnGuardar.setEnabled(false);
         btnModificar.setEnabled(false);
         btnEliminar.setEnabled(false);
@@ -74,99 +77,108 @@ public class FrmMaquinaria extends javax.swing.JInternalFrame {
         txtAncho.setEnabled(true);
         txtLargo.setEnabled(true);
         txtPrecio.setEnabled(true);
-        
+
         btnGuardar.setEnabled(true);
         btnModificar.setEnabled(true);
         btnEliminar.setEnabled(true);
         btnCancelar.setEnabled(true);
     }
-    
+
     public void mostrarDatos() {
         DefaultTableModel tabla;
-        String encabezados[] = {"ID Maquinaria", "Nombre Maquinaria", "Peso", "Año de Adquisición", 
+        String encabezados[] = {"ID Maquinaria", "Nombre Maquinaria", "Peso", "Año de Adquisición",
             "Precio", "Largo", "Ancho", "Tipo", "Proyecto"};
         tabla = new DefaultTableModel(null, encabezados);
         Object datos[] = new Object[9];
         try {
             List lista;
             lista = daoMaquinaria.findMaquinariaEntities();
-            for (int i = 0; i < lista.size(); i++) {
-                maquinaria = (Maquinaria) lista.get(i);
-                datos[0] = maquinaria.getIdMaquinaria();
-                datos[1] = maquinaria.getNombreMaquina();
-                datos[2] = maquinaria.getPeso();
-                datos[3] = maquinaria.getAnioAdquisicion();
-                datos[4] = maquinaria.getPrecio();
-                datos[5] = maquinaria.getLargo();
-                datos[6] = maquinaria.getAncho();
-                datos[7] = maquinaria.getIdTipo().getIdTipo();
-                datos[8] = maquinaria.getIdProyecto().getIdProyecto();
-                tabla.addRow(datos);
+
+            if (lista != null) {
+                for (int i = 0; i < lista.size(); i++) {
+                    maquinaria = (Maquinaria) lista.get(i);
+                    datos[0] = maquinaria.getIdMaquinaria();
+                    datos[1] = maquinaria.getNombreMaquina();
+                    datos[2] = maquinaria.getPeso();
+                    datos[3] = maquinaria.getAnioAdquisicion();
+                    datos[4] = maquinaria.getPrecio();
+                    datos[5] = maquinaria.getLargo();
+                    datos[6] = maquinaria.getAncho();
+                    datos[7] = maquinaria.getIdTipo().getIdTipo();
+                    datos[8] = maquinaria.getIdProyecto().getIdProyecto();
+                    tabla.addRow(datos);
+                }
             }
             this.TablaDatos.setModel(tabla);
         } catch (Exception e) {
             message.printMessageAlerts("¡Error: " + e.getMessage() + "!", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
-        public void llenarTabla() {
-        int fila = this.TablaDatos.getSelectedRow();
-        this.txtIdMaquinaria.setText(String.valueOf(this.TablaDatos.getValueAt(fila, 0)));
-        this.txtNombreMaquinaria.setText(String.valueOf(this.TablaDatos.getValueAt(fila, 1)));
-        this.txtPeso.setText(String.valueOf(this.TablaDatos.getValueAt(fila, 2)));
-        this.txtAnioAdquisicion.setText(String.valueOf(this.TablaDatos.getValueAt(fila, 3)));
-        this.txtPrecio.setText(validarCampos.numberFormat(String.valueOf(this.TablaDatos.getValueAt(fila, 4))));
-        this.txtLargo.setText(String.valueOf(this.TablaDatos.getValueAt(fila, 5)));
-        this.txtAncho.setText(String.valueOf(this.TablaDatos.getValueAt(fila, 6)));
-        
-        int tipoSeleccionado = Integer.parseInt(String.valueOf(this.TablaDatos.getValueAt(fila, 7)));
 
-        for (Tipomaquinaria obj : daoTipoMaquinaria.getTipoMaquinariaSeleccionada(tipoSeleccionado)) {
-            cmbTipo.getModel().setSelectedItem(obj.getNombre());
-        }
-        
-        int proyectoSeleccionado = Integer.parseInt(String.valueOf(this.TablaDatos.getValueAt(fila, 8)));
+    public void llenarTabla() {
+        try {
+            int fila = this.TablaDatos.getSelectedRow();
+            this.txtIdMaquinaria.setText(String.valueOf(this.TablaDatos.getValueAt(fila, 0)));
+            this.txtNombreMaquinaria.setText(String.valueOf(this.TablaDatos.getValueAt(fila, 1)));
+            this.txtPeso.setText(String.valueOf(this.TablaDatos.getValueAt(fila, 2)));
+            this.txtAnioAdquisicion.setText(String.valueOf(this.TablaDatos.getValueAt(fila, 3)));
+            this.txtPrecio.setText(validarCampos.numberFormat(String.valueOf(this.TablaDatos.getValueAt(fila, 4))));
+            this.txtLargo.setText(String.valueOf(this.TablaDatos.getValueAt(fila, 5)));
+            this.txtAncho.setText(String.valueOf(this.TablaDatos.getValueAt(fila, 6)));
 
-        for (Proyecto obj : daoProyecto.getProyecto(proyectoSeleccionado)) {
-            cmbProyecto.getModel().setSelectedItem(obj.getNombreProyecto());
+            int tipoSeleccionado = Integer.parseInt(String.valueOf(this.TablaDatos.getValueAt(fila, 7)));
+
+            for (Tipomaquinaria obj : daoTipoMaquinaria.getTipoMaquinariaSeleccionada(tipoSeleccionado)) {
+                cmbTipo.getModel().setSelectedItem(obj.getNombre());
+            }
+
+            int proyectoSeleccionado = Integer.parseInt(String.valueOf(this.TablaDatos.getValueAt(fila, 8)));
+
+            for (Proyecto obj : daoProyecto.getProyecto(proyectoSeleccionado)) {
+                cmbProyecto.getModel().setSelectedItem(obj.getNombreProyecto());
+            }
+        } catch (Exception e) {
         }
     }
 
     public void setearValores() {
-        maquinaria.setIdMaquinaria(0);
-        maquinaria.setNombreMaquina(txtNombreMaquinaria.getText());
-        maquinaria.setPeso(Double.parseDouble(txtPeso.getText()));
-        maquinaria.setAnioAdquisicion(txtAnioAdquisicion.getText());
-        String precio = txtPrecio.getText().replace("$", "").replace(",", "");
-        maquinaria.setPrecio(Double.parseDouble(precio));
-        maquinaria.setLargo(Double.parseDouble(txtLargo.getText()));
-        maquinaria.setAncho(Double.parseDouble(txtAncho.getText()));
-        
-        //recuperar datos cmbTipo
-        String tipoMaquinariaSeleccionado = cmbTipo.getSelectedItem().toString();
-        ComboItem itemTipo = new ComboItem();
+        try {
+            maquinaria.setIdMaquinaria(0);
+            maquinaria.setNombreMaquina(txtNombreMaquinaria.getText());
+            maquinaria.setPeso(Double.parseDouble(txtPeso.getText()));
+            maquinaria.setAnioAdquisicion(txtAnioAdquisicion.getText());
+            String precio = txtPrecio.getText().replace("$", "").replace(",", "");
+            maquinaria.setPrecio(Double.parseDouble(precio));
+            maquinaria.setLargo(Double.parseDouble(txtLargo.getText()));
+            maquinaria.setAncho(Double.parseDouble(txtAncho.getText()));
 
-        for (int i = 0; i < cmbTipo.getItemCount(); i++) {
-            if (tipoMaquinariaSeleccionado.equals(cmbTipo.getItemAt(i).toString())) {
-                itemTipo = cmbTipo.getModel().getElementAt(i);
-            }
-        }
-        
-        tipoMaquinaria.setIdTipo(itemTipo.getValue());
-        maquinaria.setIdTipo(tipoMaquinaria);
-        
-        //recuperar datos cmbProyecto
-        String proyectoSeleccionado = cmbProyecto.getSelectedItem().toString();
-        ComboItem itemProyecto = new ComboItem();
+            //recuperar datos cmbTipo
+            String tipoMaquinariaSeleccionado = cmbTipo.getSelectedItem().toString();
+            ComboItem itemTipo = new ComboItem();
 
-        for (int i = 0; i < cmbProyecto.getItemCount(); i++) {
-            if (proyectoSeleccionado.equals(cmbProyecto.getItemAt(i).toString())) {
-                itemProyecto = cmbProyecto.getModel().getElementAt(i);
+            for (int i = 0; i < cmbTipo.getItemCount(); i++) {
+                if (tipoMaquinariaSeleccionado.equals(cmbTipo.getItemAt(i).toString())) {
+                    itemTipo = cmbTipo.getModel().getElementAt(i);
+                }
             }
+
+            tipoMaquinaria.setIdTipo(itemTipo.getValue());
+            maquinaria.setIdTipo(tipoMaquinaria);
+
+            //recuperar datos cmbProyecto
+            String proyectoSeleccionado = cmbProyecto.getSelectedItem().toString();
+            ComboItem itemProyecto = new ComboItem();
+
+            for (int i = 0; i < cmbProyecto.getItemCount(); i++) {
+                if (proyectoSeleccionado.equals(cmbProyecto.getItemAt(i).toString())) {
+                    itemProyecto = cmbProyecto.getModel().getElementAt(i);
+                }
+            }
+
+            proyecto.setIdProyecto(itemProyecto.getValue());
+            maquinaria.setIdProyecto(proyecto);
+        } catch (Exception e) {
         }
-        
-        proyecto.setIdProyecto(itemProyecto.getValue());
-        maquinaria.setIdProyecto(proyecto);
     }
 
     private void cargarComboTipoMaquinaria(JComboBox combo, List<Tipomaquinaria> list) {
@@ -239,17 +251,20 @@ public class FrmMaquinaria extends javax.swing.JInternalFrame {
             message.printMessageAlerts("¡Error!", "Mensaje", JOptionPane.ERROR_MESSAGE);
         }
     }
-        
-        public void limpiarCampos() {
-        txtIdMaquinaria.setText("");
-        txtNombreMaquinaria.setText("");
-        txtPeso.setText("");
-        txtAnioAdquisicion.setText("");
-        txtPrecio.setText("");
-        txtLargo.setText("");
-        txtAncho.setText("");
-        cmbTipo.setSelectedIndex(0);
-        cmbProyecto.setSelectedIndex(0);
+
+    public void limpiarCampos() {
+        try {
+            txtIdMaquinaria.setText("");
+            txtNombreMaquinaria.setText("");
+            txtPeso.setText("");
+            txtAnioAdquisicion.setText("");
+            txtPrecio.setText("");
+            txtLargo.setText("");
+            txtAncho.setText("");
+            cmbTipo.setSelectedIndex(0);
+            cmbProyecto.setSelectedIndex(0);
+        } catch (Exception e) {
+        }
     }
 
     /**
@@ -288,26 +303,41 @@ public class FrmMaquinaria extends javax.swing.JInternalFrame {
         jLabel10 = new javax.swing.JLabel();
         cmbProyecto = new javax.swing.JComboBox<>();
         txtPeso = new javax.swing.JTextField();
+        jLabel11 = new javax.swing.JLabel();
 
         setClosable(true);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLabel1.setFont(new java.awt.Font("Times New Roman", 1, 18)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setText("Gestión de Maquinaria");
+        jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(195, 0, -1, -1));
 
         jLabel2.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
         jLabel2.setText("ID Maquinaria:");
+        jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 40, -1, -1));
 
         jLabel3.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(255, 255, 255));
         jLabel3.setText("Peso Maquinaria:");
+        jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 78, -1, -1));
 
         jLabel4.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        jLabel4.setForeground(new java.awt.Color(255, 255, 255));
         jLabel4.setText("Nombre Maquinaria");
+        jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(303, 40, -1, -1));
 
         jLabel5.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        jLabel5.setForeground(new java.awt.Color(255, 255, 255));
         jLabel5.setText("Año de adquisicion:");
+        jPanel1.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(303, 78, -1, -1));
 
         txtIdMaquinaria.setEditable(false);
         txtIdMaquinaria.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        jPanel1.add(txtIdMaquinaria, new org.netbeans.lib.awtextra.AbsoluteConstraints(121, 37, 140, -1));
 
         TablaDatos.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
         TablaDatos.setModel(new javax.swing.table.DefaultTableModel(
@@ -328,212 +358,111 @@ public class FrmMaquinaria extends javax.swing.JInternalFrame {
         });
         jScrollPane2.setViewportView(TablaDatos);
 
+        jPanel1.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 271, 545, 123));
+
         btnNuevoRegistro.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
-        btnNuevoRegistro.setText("Nuevo");
+        btnNuevoRegistro.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/add.png"))); // NOI18N
+        btnNuevoRegistro.setMargin(new java.awt.Insets(2, 6, 2, 6));
         btnNuevoRegistro.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 btnNuevoRegistroMouseClicked(evt);
             }
         });
+        jPanel1.add(btnNuevoRegistro, new org.netbeans.lib.awtextra.AbsoluteConstraints(57, 230, -1, -1));
 
         btnGuardar.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
-        btnGuardar.setText("Guardar");
+        btnGuardar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/icons8-guardar-24.png"))); // NOI18N
+        btnGuardar.setMargin(new java.awt.Insets(2, 6, 2, 6));
         btnGuardar.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 btnGuardarMouseClicked(evt);
             }
         });
+        jPanel1.add(btnGuardar, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 230, -1, -1));
 
         btnModificar.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
-        btnModificar.setText("Modificar");
+        btnModificar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/icons8-editar-archivo-24.png"))); // NOI18N
+        btnModificar.setMargin(new java.awt.Insets(2, 6, 2, 6));
         btnModificar.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 btnModificarMouseClicked(evt);
             }
         });
+        jPanel1.add(btnModificar, new org.netbeans.lib.awtextra.AbsoluteConstraints(235, 230, -1, -1));
 
         btnEliminar.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
-        btnEliminar.setText("Eliminar");
+        btnEliminar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/icons8-basura-24.png"))); // NOI18N
+        btnEliminar.setMargin(new java.awt.Insets(2, 6, 2, 6));
         btnEliminar.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 btnEliminarMouseClicked(evt);
             }
         });
+        jPanel1.add(btnEliminar, new org.netbeans.lib.awtextra.AbsoluteConstraints(328, 230, -1, -1));
 
         btnCancelar.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
-        btnCancelar.setText("Cancelar");
+        btnCancelar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/icons8-cancelar-24.png"))); // NOI18N
+        btnCancelar.setMargin(new java.awt.Insets(2, 6, 2, 6));
         btnCancelar.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 btnCancelarMouseClicked(evt);
             }
         });
+        jPanel1.add(btnCancelar, new org.netbeans.lib.awtextra.AbsoluteConstraints(425, 230, -1, -1));
 
         txtAnioAdquisicion.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        jPanel1.add(txtAnioAdquisicion, new org.netbeans.lib.awtextra.AbsoluteConstraints(414, 75, 140, -1));
 
         txtNombreMaquinaria.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        jPanel1.add(txtNombreMaquinaria, new org.netbeans.lib.awtextra.AbsoluteConstraints(414, 37, 140, -1));
 
         jLabel6.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        jLabel6.setForeground(new java.awt.Color(255, 255, 255));
         jLabel6.setText("Proyecto:");
+        jPanel1.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 116, -1, -1));
 
         jLabel7.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        jLabel7.setForeground(new java.awt.Color(255, 255, 255));
         jLabel7.setText("Tipo:");
+        jPanel1.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(303, 116, -1, -1));
 
         jLabel8.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        jLabel8.setForeground(new java.awt.Color(255, 255, 255));
         jLabel8.setText("Largo:");
+        jPanel1.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 154, -1, -1));
 
         txtLargo.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        jPanel1.add(txtLargo, new org.netbeans.lib.awtextra.AbsoluteConstraints(121, 151, 140, -1));
 
         jLabel9.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        jLabel9.setForeground(new java.awt.Color(255, 255, 255));
         jLabel9.setText("Ancho:");
+        jPanel1.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(303, 154, -1, -1));
 
         txtAncho.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        jPanel1.add(txtAncho, new org.netbeans.lib.awtextra.AbsoluteConstraints(415, 151, 140, -1));
 
         cmbTipo.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        jPanel1.add(cmbTipo, new org.netbeans.lib.awtextra.AbsoluteConstraints(414, 113, 140, -1));
 
         txtPrecio.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        jPanel1.add(txtPrecio, new org.netbeans.lib.awtextra.AbsoluteConstraints(121, 189, 140, -1));
 
         jLabel10.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        jLabel10.setForeground(new java.awt.Color(255, 255, 255));
         jLabel10.setText("Precio:");
+        jPanel1.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 192, -1, -1));
 
         cmbProyecto.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        jPanel1.add(cmbProyecto, new org.netbeans.lib.awtextra.AbsoluteConstraints(121, 113, 140, -1));
 
         txtPeso.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        jPanel1.add(txtPeso, new org.netbeans.lib.awtextra.AbsoluteConstraints(121, 75, 140, -1));
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(195, 195, 195)
-                .addComponent(jLabel1)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane2)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(jPanel1Layout.createSequentialGroup()
-                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(jLabel2)
-                                            .addComponent(jLabel3))
-                                        .addGap(18, 18, 18)
-                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                            .addComponent(txtPeso, javax.swing.GroupLayout.DEFAULT_SIZE, 140, Short.MAX_VALUE)
-                                            .addComponent(txtIdMaquinaria)
-                                            .addComponent(cmbProyecto, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                            .addComponent(txtLargo)))
-                                    .addComponent(jLabel8)
-                                    .addComponent(jLabel6))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(jPanel1Layout.createSequentialGroup()
-                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(jLabel4)
-                                            .addComponent(jLabel5)
-                                            .addComponent(jLabel7))
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(txtNombreMaquinaria, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(txtAnioAdquisicion, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(cmbTipo, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                    .addGroup(jPanel1Layout.createSequentialGroup()
-                                        .addComponent(jLabel9)
-                                        .addGap(75, 75, 75)
-                                        .addComponent(txtAncho, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE))))))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jLabel10)
-                                .addGap(74, 74, 74)
-                                .addComponent(txtPrecio, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGap(57, 57, 57)
-                                .addComponent(btnNuevoRegistro)
-                                .addGap(18, 18, 18)
-                                .addComponent(btnGuardar)
-                                .addGap(18, 18, 18)
-                                .addComponent(btnModificar)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(btnEliminar)
-                                .addGap(18, 18, 18)
-                                .addComponent(btnCancelar)))
-                        .addGap(0, 49, Short.MAX_VALUE)))
-                .addContainerGap())
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(jLabel1)
-                .addGap(15, 15, 15)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel2)
-                            .addComponent(txtIdMaquinaria, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel3)
-                            .addComponent(txtPeso, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel6)
-                            .addComponent(cmbProyecto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel8)
-                            .addComponent(txtLargo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel4)
-                            .addComponent(txtNombreMaquinaria, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel5)
-                            .addComponent(txtAnioAdquisicion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel7)
-                            .addComponent(cmbTipo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel9)
-                            .addComponent(txtAncho, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel10)
-                    .addComponent(txtPrecio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(21, 21, 21)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnNuevoRegistro)
-                    .addComponent(btnGuardar)
-                    .addComponent(btnModificar)
-                    .addComponent(btnEliminar)
-                    .addComponent(btnCancelar))
-                .addGap(18, 18, 18)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 30, 570, 407));
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
-        );
+        jLabel11.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/Fondo.jpg"))); // NOI18N
+        getContentPane().add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 630, 460));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -576,6 +505,7 @@ public class FrmMaquinaria extends javax.swing.JInternalFrame {
     private javax.swing.JComboBox<ComboItem> cmbTipo;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
