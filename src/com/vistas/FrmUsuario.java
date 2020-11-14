@@ -22,8 +22,8 @@ import javax.swing.table.DefaultTableModel;
  * Nombre del Formulario: FrmUsuario 
  * Fecha: 05/11/2020 
  * CopyRight: Pedro Campos
- * modificación: 12/11/2020 
- * Version: 1.2
+ * modificación: 14/11/2020 
+ * Version: 1.3
  * @author pedro
  */
 public class FrmUsuario extends javax.swing.JInternalFrame {
@@ -34,7 +34,8 @@ public class FrmUsuario extends javax.swing.JInternalFrame {
     Mensajeria message = new Mensajeria();
     EncriptarDesencriptar encode = new EncriptarDesencriptar();
 
-    String oldPassword = "";
+    String claveEncriptada = "";
+    String claveDesEncriptada = "";
 
     public FrmUsuario() {
         initComponents();
@@ -99,7 +100,8 @@ public class FrmUsuario extends javax.swing.JInternalFrame {
             this.txtPassword.setText(String.valueOf(this.TablaDatos.getValueAt(fila, 2)));
 
             try {
-                oldPassword = encode.Desencriptar(txtPassword.getText());
+                claveEncriptada = String.valueOf(this.TablaDatos.getValueAt(fila, 2));
+                claveDesEncriptada = encode.Desencriptar(claveEncriptada);
             } catch (Exception e) {
             }
 
@@ -128,20 +130,26 @@ public class FrmUsuario extends javax.swing.JInternalFrame {
         }
     }
 
-    public void setearValores() {
+    public void setearValores(boolean flag) {
         try {
             Rol rol = new Rol();
             user.setIdUsuario(0);
             user.setNombreUsuario(txtNombre.getText());
 
-            try {
-                String newPassword = encode.Desencriptar(txtPassword.getText());
-                if (newPassword.equals(oldPassword)) {
-                    user.setPassword(encode.Encriptar(oldPassword));
-                } else {
-                    user.setPassword(encode.Encriptar(txtPassword.getText()));
+            if (flag) {
+                try {
+                    if (claveEncriptada.equals(txtPassword.getText())) {
+                        user.setPassword(claveEncriptada);
+                    } else if (claveDesEncriptada.equals(txtPassword.getText())) {
+                        user.setPassword(encode.Encriptar(txtPassword.getText()));
+                    } else {
+                        user.setPassword(encode.Encriptar(txtPassword.getText()));
+                    }
+                } catch (Exception ex) {
+
                 }
-            } catch (Exception e) {
+            } else {
+                user.setPassword(encode.Encriptar(txtPassword.getText()));
             }
 
             //recuperar datos cmbRol
@@ -162,7 +170,7 @@ public class FrmUsuario extends javax.swing.JInternalFrame {
 
     public void insertar() {
         try {
-            setearValores();
+            setearValores(false);
 
             daoUsuarios.create(user);
 
@@ -180,7 +188,7 @@ public class FrmUsuario extends javax.swing.JInternalFrame {
         try {
             int respuesta = message.printMessageConfirm("¿Desea modificar los datos?", "Mensaje", JOptionPane.YES_NO_OPTION);
             if (respuesta == JOptionPane.YES_OPTION) {
-                setearValores();
+                setearValores(true);
 
                 user.setIdUsuario(Integer.parseInt(txtIdUsuario.getText()));
                 daoUsuarios.edit(user);
@@ -202,7 +210,7 @@ public class FrmUsuario extends javax.swing.JInternalFrame {
         try {
             int respuesta = message.printMessageConfirm("¿Desea eliminar los datos?", "Mensaje", JOptionPane.YES_NO_OPTION);
             if (respuesta == JOptionPane.YES_OPTION) {
-                setearValores();
+                setearValores(false);
 
                 daoUsuarios.destroy(Integer.parseInt(txtIdUsuario.getText()));
 

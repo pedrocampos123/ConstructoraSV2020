@@ -186,7 +186,8 @@ public class UsuarioJpaController implements Serializable {
             
             if(!resultado.isEmpty()){            
                 for (Usuario user : resultado) {
-                    String clave = lock.Desencriptar(user.getPassword());
+                    String clavePrueba = user.getPassword().toString();
+                    String clave = lock.Desencriptar(clavePrueba);
                     if(clave.equals(password))
                         return true;
                     else

@@ -39,11 +39,7 @@ public class FrmPrincipal extends javax.swing.JFrame {
             switch (obj.getAcceso().getTipoNivel()) {
                 case "Administrador":
                     break;
-                case "Empleado":
-                    //bloquea la accion de los item de menu
-                    usuarioItem.setEnabled(false);
-                    break;
-                case "Invitado":
+                default:
                     //bloquea la accion de los item de menu
                     ubicacionItem.setEnabled(false);
                     usuarioItem.setEnabled(false);
@@ -53,8 +49,6 @@ public class FrmPrincipal extends javax.swing.JFrame {
                     pagoEmpleadoItem.setEnabled(false);
                     maquinariaItem.setEnabled(false);
                     tipoMaquinaria.setEnabled(false);
-                    break;
-                default:
                     break;
             }
         } catch (Exception e) {
