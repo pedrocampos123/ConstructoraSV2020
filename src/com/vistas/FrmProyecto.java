@@ -13,6 +13,7 @@ import com.utilidades.ValidarCampos;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import javax.swing.JTextField;
 
 /**
  * Nombre de la clase: FrmProyecto 
@@ -34,13 +35,12 @@ public class FrmProyecto extends javax.swing.JInternalFrame {
 
     public FrmProyecto() {
         initComponents();
+        ((JTextField) this.jchFecha.getDateEditor()).setEditable(false);         
         this.setTitle("Proyectos");
         //setResizable(false);
         jPanel1.setOpaque(false);
+        deshabilitar();
         mostrarDatos();
-        
-        
-        
     }
 
     public void mostrarDatos() {
@@ -77,10 +77,10 @@ public class FrmProyecto extends javax.swing.JInternalFrame {
         txtTiempo.setEnabled(false);
         txtPrecio.setEnabled(false);
         this.cmbEstado.setEnabled(false);
-        this.btnInsertar.setEnabled(true);
+        this.btnInsertar.setEnabled(false);
         this.btnModificar.setEnabled(false);
         this.btnEliminar.setEnabled(false);
-        this.btnLimpiar.setEnabled(true);
+        this.btnLimpiar.setEnabled(false);
     }
 
     public void habilitar() {
@@ -438,6 +438,11 @@ public class FrmProyecto extends javax.swing.JInternalFrame {
 
         jchFecha.setDateFormatString("dd-MM-yyyy");
         jchFecha.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        jchFecha.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                jchFechaKeyTyped(evt);
+            }
+        });
         jPanel1.add(jchFecha, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 40, 170, -1));
 
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 20, 640, 350));
@@ -470,7 +475,7 @@ public class FrmProyecto extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_btnNuevoMouseClicked
 
     private void txtPrecioKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtPrecioKeyTyped
-        validarCampos.numbersAndPoint(evt, txtTiempo);
+        validarCampos.numbersAndPointAndComa(evt, txtPrecio);
     }//GEN-LAST:event_txtPrecioKeyTyped
 
     private void txtCodigoKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCodigoKeyTyped
@@ -478,7 +483,7 @@ public class FrmProyecto extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_txtCodigoKeyTyped
 
     private void txtProyectoNameKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtProyectoNameKeyTyped
-        
+        validarCampos.spaceAndWords(evt, txtProyectoName);
     }//GEN-LAST:event_txtProyectoNameKeyTyped
 
     private void txtTiempoKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtTiempoKeyTyped
@@ -509,6 +514,10 @@ public class FrmProyecto extends javax.swing.JInternalFrame {
     private void TablaProyectoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TablaProyectoMouseClicked
         llenarTabla();
     }//GEN-LAST:event_TablaProyectoMouseClicked
+
+    private void jchFechaKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jchFechaKeyTyped
+       validarCampos.NoLetters(evt, jchFecha);
+    }//GEN-LAST:event_jchFechaKeyTyped
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

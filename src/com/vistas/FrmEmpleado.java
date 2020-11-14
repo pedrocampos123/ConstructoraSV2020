@@ -262,6 +262,11 @@ public class FrmEmpleado extends javax.swing.JInternalFrame {
         jPanel1.add(txtIdEmpleado, new org.netbeans.lib.awtextra.AbsoluteConstraints(99, 37, 111, -1));
 
         txtNombre.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        txtNombre.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtNombreKeyTyped(evt);
+            }
+        });
         jPanel1.add(txtNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(99, 75, 111, -1));
 
         cmbProyecto.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
@@ -340,6 +345,11 @@ public class FrmEmpleado extends javax.swing.JInternalFrame {
         jPanel1.add(btnCancelar, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 110, -1, -1));
 
         txtSalario.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        txtSalario.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtSalarioKeyTyped(evt);
+            }
+        });
         jPanel1.add(txtSalario, new org.netbeans.lib.awtextra.AbsoluteConstraints(287, 37, 140, -1));
 
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 20, 450, 290));
@@ -374,6 +384,14 @@ public class FrmEmpleado extends javax.swing.JInternalFrame {
     private void btnCancelarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnCancelarMouseClicked
         limpiarCampos();
     }//GEN-LAST:event_btnCancelarMouseClicked
+
+    private void txtNombreKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtNombreKeyTyped
+        validarCampos.spaceAndWords(evt, txtNombre);
+    }//GEN-LAST:event_txtNombreKeyTyped
+
+    private void txtSalarioKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSalarioKeyTyped
+        validarCampos.numbersAndPoint(evt, txtSalario);
+    }//GEN-LAST:event_txtSalarioKeyTyped
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

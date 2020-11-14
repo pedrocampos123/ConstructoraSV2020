@@ -8,6 +8,7 @@ package com.vistas;
 import com.controller.RolJpaController;
 import com.entities.Rol;
 import com.utilidades.Mensajeria;
+import com.utilidades.ValidarCampos;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
@@ -201,6 +202,11 @@ public class FrmRoles extends javax.swing.JInternalFrame {
         jPanel1.add(txtIdRol, new org.netbeans.lib.awtextra.AbsoluteConstraints(66, 37, 111, -1));
 
         txtNombre.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        txtNombre.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtNombreKeyTyped(evt);
+            }
+        });
         jPanel1.add(txtNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(259, 37, 130, -1));
 
         TablaDatos.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
@@ -306,6 +312,11 @@ public class FrmRoles extends javax.swing.JInternalFrame {
     private void btnCancelarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnCancelarMouseClicked
         limpiarCampos();
     }//GEN-LAST:event_btnCancelarMouseClicked
+
+    private void txtNombreKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtNombreKeyTyped
+        ValidarCampos validar = new ValidarCampos();
+        validar.onlyWords(evt);
+    }//GEN-LAST:event_txtNombreKeyTyped
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

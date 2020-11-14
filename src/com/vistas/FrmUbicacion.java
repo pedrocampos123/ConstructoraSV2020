@@ -42,6 +42,7 @@ public class FrmUbicacion extends javax.swing.JInternalFrame {
         this.setTitle("Ubicaciones");
         //setResizable(false);
         jPanel1.setOpaque(false);
+        deshabilitar();
         mostrarDatos();
     }
 
@@ -394,6 +395,7 @@ public class FrmUbicacion extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_btnInsertarMouseClicked
 
     private void btnNuevoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnNuevoMouseClicked
+        habilitar();
         limpiarCampos();
         modificacion = false;
     }//GEN-LAST:event_btnNuevoMouseClicked

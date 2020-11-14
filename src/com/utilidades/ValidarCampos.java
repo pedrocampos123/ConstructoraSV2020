@@ -1,6 +1,7 @@
 
 package com.utilidades;
 
+import com.toedter.calendar.JDateChooser;
 import java.awt.event.KeyEvent;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -48,10 +49,32 @@ public class ValidarCampos {
     }
     
     /**
+     * Validar no permite letras, tampoco numeros
+     */    
+    public void NoLetters(KeyEvent evt, JDateChooser textField){
+            evt.consume();
+    }
+    
+    /**
      * Validar solo palabras y espacios
      */    
     public void spaceAndWords(KeyEvent evt, JTextField textField){
         if(!Character.isLetter(evt.getKeyChar()) && evt.getKeyChar() != ' '){
+            evt.consume();
+        }
+    }
+    
+    /**
+     * Validar solo numeros y un punto y una coma
+     */
+    public void numbersAndPointAndComa(KeyEvent evt, JTextField textField){
+        if(!Character.isDigit(evt.getKeyChar()) && evt.getKeyChar() != '.' && evt.getKeyChar() != ','){
+            evt.consume();
+        }
+        if(evt.getKeyChar() == '.' && textField.getText().contains(".")){
+            evt.consume();
+        }
+        if(evt.getKeyChar() == ',' && textField.getText().contains(",")){
             evt.consume();
         }
     }

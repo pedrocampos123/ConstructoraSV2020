@@ -6,6 +6,7 @@ import java.util.List;
 import javax.swing.table.DefaultTableModel;
 import com.entities.Tipomaquinaria;
 import com.utilidades.Mensajeria;
+import com.utilidades.ValidarCampos;
 import javax.swing.JOptionPane;
 
 /**
@@ -191,6 +192,11 @@ public class FrmTipoMaquinaria extends javax.swing.JInternalFrame {
         jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(19, 69, -1, -1));
 
         txtNombre.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        txtNombre.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtNombreKeyTyped(evt);
+            }
+        });
         jPanel1.add(txtNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(145, 66, 161, -1));
 
         btnNuevoRegistro.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
@@ -296,6 +302,11 @@ public class FrmTipoMaquinaria extends javax.swing.JInternalFrame {
     private void TablaDatosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TablaDatosMouseClicked
         llenarTabla();
     }//GEN-LAST:event_TablaDatosMouseClicked
+
+    private void txtNombreKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtNombreKeyTyped
+        ValidarCampos validar = new ValidarCampos();
+        validar.onlyWords(evt);
+    }//GEN-LAST:event_txtNombreKeyTyped
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

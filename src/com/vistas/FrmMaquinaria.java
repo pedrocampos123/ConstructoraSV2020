@@ -14,9 +14,13 @@ import com.entities.Tipomaquinaria;
 import com.utilidades.ComboItem;
 import com.utilidades.Mensajeria;
 import com.utilidades.ValidarCampos;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -43,6 +47,7 @@ public class FrmMaquinaria extends javax.swing.JInternalFrame {
      */
     public FrmMaquinaria() {
         initComponents();
+        ((JTextField) this.txtAnioAdquisicion.getDateEditor()).setEditable(false); 
         this.setTitle("Maquinaria");
         //setResizable(false);
         jPanel1.setOpaque(false);
@@ -121,7 +126,15 @@ public class FrmMaquinaria extends javax.swing.JInternalFrame {
             this.txtIdMaquinaria.setText(String.valueOf(this.TablaDatos.getValueAt(fila, 0)));
             this.txtNombreMaquinaria.setText(String.valueOf(this.TablaDatos.getValueAt(fila, 1)));
             this.txtPeso.setText(String.valueOf(this.TablaDatos.getValueAt(fila, 2)));
-            this.txtAnioAdquisicion.setText(String.valueOf(this.TablaDatos.getValueAt(fila, 3)));
+            
+            try {
+                String sDate1 = String.valueOf(this.TablaDatos.getValueAt(fila, 2));  
+                Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
+                this.txtAnioAdquisicion.setDate(date1);
+            } catch (Exception e) {
+            }
+            
+            //this.txtAnioAdquisicion.setText(String.valueOf(this.TablaDatos.getValueAt(fila, 3)));
             this.txtPrecio.setText(validarCampos.numberFormat(String.valueOf(this.TablaDatos.getValueAt(fila, 4))));
             this.txtLargo.setText(String.valueOf(this.TablaDatos.getValueAt(fila, 5)));
             this.txtAncho.setText(String.valueOf(this.TablaDatos.getValueAt(fila, 6)));
@@ -146,7 +159,21 @@ public class FrmMaquinaria extends javax.swing.JInternalFrame {
             maquinaria.setIdMaquinaria(0);
             maquinaria.setNombreMaquina(txtNombreMaquinaria.getText());
             maquinaria.setPeso(Double.parseDouble(txtPeso.getText()));
-            maquinaria.setAnioAdquisicion(txtAnioAdquisicion.getText());
+            
+            try {
+                int year;
+                int month;
+                int day;
+                
+                year = txtAnioAdquisicion.getCalendar().get(Calendar.YEAR);
+                month = txtAnioAdquisicion.getCalendar().get(Calendar.MONTH) + 1;
+                day = txtAnioAdquisicion.getCalendar().get(Calendar.DAY_OF_MONTH);
+                
+                maquinaria.setAnioAdquisicion(day + "/" + month + "/"+ year);
+            } catch (Exception e) {
+            }
+            
+            //maquinaria.setAnioAdquisicion(txtAnioAdquisicion.getText());
             String precio = txtPrecio.getText().replace("$", "").replace(",", "");
             maquinaria.setPrecio(Double.parseDouble(precio));
             maquinaria.setLargo(Double.parseDouble(txtLargo.getText()));
@@ -257,7 +284,7 @@ public class FrmMaquinaria extends javax.swing.JInternalFrame {
             txtIdMaquinaria.setText("");
             txtNombreMaquinaria.setText("");
             txtPeso.setText("");
-            txtAnioAdquisicion.setText("");
+            this.txtAnioAdquisicion.setCalendar(null);
             txtPrecio.setText("");
             txtLargo.setText("");
             txtAncho.setText("");
@@ -290,7 +317,6 @@ public class FrmMaquinaria extends javax.swing.JInternalFrame {
         btnModificar = new javax.swing.JButton();
         btnEliminar = new javax.swing.JButton();
         btnCancelar = new javax.swing.JButton();
-        txtAnioAdquisicion = new javax.swing.JTextField();
         txtNombreMaquinaria = new javax.swing.JTextField();
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
@@ -303,6 +329,7 @@ public class FrmMaquinaria extends javax.swing.JInternalFrame {
         jLabel10 = new javax.swing.JLabel();
         cmbProyecto = new javax.swing.JComboBox<>();
         txtPeso = new javax.swing.JTextField();
+        txtAnioAdquisicion = new com.toedter.calendar.JDateChooser();
         jLabel11 = new javax.swing.JLabel();
 
         setClosable(true);
@@ -410,10 +437,12 @@ public class FrmMaquinaria extends javax.swing.JInternalFrame {
         });
         jPanel1.add(btnCancelar, new org.netbeans.lib.awtextra.AbsoluteConstraints(425, 230, -1, -1));
 
-        txtAnioAdquisicion.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
-        jPanel1.add(txtAnioAdquisicion, new org.netbeans.lib.awtextra.AbsoluteConstraints(414, 75, 140, -1));
-
         txtNombreMaquinaria.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        txtNombreMaquinaria.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtNombreMaquinariaKeyTyped(evt);
+            }
+        });
         jPanel1.add(txtNombreMaquinaria, new org.netbeans.lib.awtextra.AbsoluteConstraints(414, 37, 140, -1));
 
         jLabel6.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
@@ -432,6 +461,11 @@ public class FrmMaquinaria extends javax.swing.JInternalFrame {
         jPanel1.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 154, -1, -1));
 
         txtLargo.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        txtLargo.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtLargoKeyTyped(evt);
+            }
+        });
         jPanel1.add(txtLargo, new org.netbeans.lib.awtextra.AbsoluteConstraints(121, 151, 140, -1));
 
         jLabel9.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
@@ -440,12 +474,22 @@ public class FrmMaquinaria extends javax.swing.JInternalFrame {
         jPanel1.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(303, 154, -1, -1));
 
         txtAncho.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        txtAncho.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtAnchoKeyTyped(evt);
+            }
+        });
         jPanel1.add(txtAncho, new org.netbeans.lib.awtextra.AbsoluteConstraints(415, 151, 140, -1));
 
         cmbTipo.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
         jPanel1.add(cmbTipo, new org.netbeans.lib.awtextra.AbsoluteConstraints(414, 113, 140, -1));
 
         txtPrecio.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        txtPrecio.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtPrecioKeyTyped(evt);
+            }
+        });
         jPanel1.add(txtPrecio, new org.netbeans.lib.awtextra.AbsoluteConstraints(121, 189, 140, -1));
 
         jLabel10.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
@@ -457,7 +501,15 @@ public class FrmMaquinaria extends javax.swing.JInternalFrame {
         jPanel1.add(cmbProyecto, new org.netbeans.lib.awtextra.AbsoluteConstraints(121, 113, 140, -1));
 
         txtPeso.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        txtPeso.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtPesoKeyTyped(evt);
+            }
+        });
         jPanel1.add(txtPeso, new org.netbeans.lib.awtextra.AbsoluteConstraints(121, 75, 140, -1));
+
+        txtAnioAdquisicion.setDateFormatString("dd-MM-yyyy");
+        jPanel1.add(txtAnioAdquisicion, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 70, 130, -1));
 
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 30, 570, 407));
 
@@ -493,6 +545,26 @@ public class FrmMaquinaria extends javax.swing.JInternalFrame {
         deshabilitar();
     }//GEN-LAST:event_btnCancelarMouseClicked
 
+    private void txtPesoKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtPesoKeyTyped
+        validarCampos.numbersAndPoint(evt, txtPeso);
+    }//GEN-LAST:event_txtPesoKeyTyped
+
+    private void txtLargoKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtLargoKeyTyped
+        validarCampos.numbersAndPoint(evt, txtLargo);
+    }//GEN-LAST:event_txtLargoKeyTyped
+
+    private void txtPrecioKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtPrecioKeyTyped
+        validarCampos.numbersAndPointAndComa(evt, txtPrecio);
+    }//GEN-LAST:event_txtPrecioKeyTyped
+
+    private void txtNombreMaquinariaKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtNombreMaquinariaKeyTyped
+        validarCampos.spaceAndWords(evt, txtNombreMaquinaria);
+    }//GEN-LAST:event_txtNombreMaquinariaKeyTyped
+
+    private void txtAnchoKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtAnchoKeyTyped
+        validarCampos.numbersAndPoint(evt, txtAncho);
+    }//GEN-LAST:event_txtAnchoKeyTyped
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTable TablaDatos;
@@ -517,7 +589,7 @@ public class FrmMaquinaria extends javax.swing.JInternalFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextField txtAncho;
-    private javax.swing.JTextField txtAnioAdquisicion;
+    private com.toedter.calendar.JDateChooser txtAnioAdquisicion;
     private javax.swing.JTextField txtIdMaquinaria;
     private javax.swing.JTextField txtLargo;
     private javax.swing.JTextField txtNombreMaquinaria;

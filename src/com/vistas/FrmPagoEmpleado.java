@@ -320,6 +320,11 @@ public class FrmPagoEmpleado extends javax.swing.JInternalFrame {
         jPanel1.add(btnCancelar, new org.netbeans.lib.awtextra.AbsoluteConstraints(328, 108, -1, -1));
 
         txtSalario.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        txtSalario.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtSalarioKeyTyped(evt);
+            }
+        });
         jPanel1.add(txtSalario, new org.netbeans.lib.awtextra.AbsoluteConstraints(271, 32, 140, -1));
 
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 20, 430, 285));
@@ -354,6 +359,10 @@ public class FrmPagoEmpleado extends javax.swing.JInternalFrame {
     private void btnCancelarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnCancelarMouseClicked
         limpiarCampos();
     }//GEN-LAST:event_btnCancelarMouseClicked
+
+    private void txtSalarioKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSalarioKeyTyped
+        validarCampos.numbersAndPoint(evt, txtSalario);
+    }//GEN-LAST:event_txtSalarioKeyTyped
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

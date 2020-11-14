@@ -12,6 +12,7 @@ import com.entities.Usuario;
 import com.utilidades.ComboItem;
 import com.utilidades.EncriptarDesencriptar;
 import com.utilidades.Mensajeria;
+import com.utilidades.ValidarCampos;
 import java.util.List;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
@@ -291,6 +292,11 @@ public class FrmUsuario extends javax.swing.JInternalFrame {
         jPanel1.add(txtIdUsuario, new org.netbeans.lib.awtextra.AbsoluteConstraints(89, 32, 111, -1));
 
         txtNombre.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
+        txtNombre.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtNombreKeyTyped(evt);
+            }
+        });
         jPanel1.add(txtNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(89, 70, 111, -1));
 
         txtPassword.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
@@ -402,6 +408,11 @@ public class FrmUsuario extends javax.swing.JInternalFrame {
     private void btnEliminarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEliminarMouseClicked
         eliminar();
     }//GEN-LAST:event_btnEliminarMouseClicked
+
+    private void txtNombreKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtNombreKeyTyped
+        ValidarCampos validar = new ValidarCampos();
+        validar.onlyWords(evt);
+    }//GEN-LAST:event_txtNombreKeyTyped
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
