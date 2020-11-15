@@ -49,6 +49,15 @@ public class FrmPrincipal extends javax.swing.JFrame {
                     pagoEmpleadoItem.setEnabled(false);
                     maquinariaItem.setEnabled(false);
                     tipoMaquinaria.setEnabled(false);
+                    
+                    ubicacionItem.setVisible(false);
+                    usuarioItem.setVisible(false);
+                    ubicacionItem.setVisible(false);
+                    rolesItem.setVisible(false);
+                    empleadoItem.setVisible(false);
+                    pagoEmpleadoItem.setVisible(false);
+                    maquinariaItem.setVisible(false);
+                    tipoMaquinaria.setVisible(false);
                     break;
             }
         } catch (Exception e) {
