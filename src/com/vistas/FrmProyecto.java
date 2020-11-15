@@ -143,7 +143,7 @@ public class FrmProyecto extends javax.swing.JInternalFrame {
                 month = jchFecha.getCalendar().get(Calendar.MONTH) + 1;
                 day = jchFecha.getCalendar().get(Calendar.DAY_OF_MONTH);
                 
-                proy.setFechaInicio(day + "/" + month + "/"+ year);
+                proy.setFechaInicio(year+ "-" + month + "-"+ day);
             } catch (Exception e) {
             }
             
@@ -436,7 +436,7 @@ public class FrmProyecto extends javax.swing.JInternalFrame {
 
         jPanel1.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 210, 570, 120));
 
-        jchFecha.setDateFormatString("dd-MM-yyyy");
+        jchFecha.setDateFormatString("yyyy-MM-dd");
         jchFecha.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
         jchFecha.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyTyped(java.awt.event.KeyEvent evt) {
