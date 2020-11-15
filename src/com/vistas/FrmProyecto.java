@@ -171,7 +171,7 @@ public class FrmProyecto extends javax.swing.JInternalFrame {
                 throw new Exception();
             }
 
-            //setear valores de ubicacion
+            //setear valores de ubicación
             proy.setIdUbicacion(locacion);
 
             //ingresar el registro a la base de datos a la tabla de proyectos
